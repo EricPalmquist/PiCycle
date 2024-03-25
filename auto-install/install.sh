@@ -2,11 +2,11 @@
 
 # Automatic Installation Script
 # Many thanks to the PiVPN project (pivpn.io) for much of the inspiration for this script
-# Run from https://raw.githubusercontent.com/nebhead/PiCycle/master/auto-install/install.sh
+# Run from https://raw.githubusercontent.com/nebhead/picycle/master/auto-install/install.sh
 #
 # Install with this command (from your Pi):
 #
-# curl https://raw.githubusercontent.com/nebhead/PiCycle/master/auto-install/install.sh | bash
+# curl https://raw.githubusercontent.com/nebhead/picycle/master/auto-install/install.sh | bash
 #
 # NOTE: Pre-Requisites to run Raspi-Config first.  See README.md.
 
@@ -39,7 +39,7 @@ r=$(( r < 20 ? 20 : r ))
 c=$(( c < 70 ? 70 : c ))
 
 # Display the welcome dialog
-whiptail --msgbox --backtitle "Welcome" --title "PiCycle Automated Installer" "This installer will transform your Single Board Computer into a connected cycle computer.  NOTE: This installer is intended to be run on a fresh install of Raspberry Pi OS Lite 32-Bit Bullseye or later." ${r} ${c}
+whiptail --msgbox --backtitle "Welcome" --title "picycle Automated Installer" "This installer will transform your Single Board Computer into a connected cycle computer.  NOTE: This installer is intended to be run on a fresh install of Raspberry Pi OS Lite 32-Bit Bullseye or later." ${r} ${c}
 
 # Starting actual steps for installation
 clear
@@ -77,14 +77,14 @@ $SUDO apt install python3-dev python3-pip python3-venv python3-rpi.gpio python3-
 clear
 echo "*************************************************************************"
 echo "**                                                                     **"
-echo "**      Cloning PiCycle from GitHub...                                  **"
+echo "**      Cloning picycle from GitHub...                                  **"
 echo "**                                                                     **"
 echo "*************************************************************************"
 cd /usr/local/bin
 # Use a shallow clone to reduce download size
-#$SUDO git clone --depth 1 https://github.com/nebhead/PiCycle
+#$SUDO git clone --depth 1 https://github.com/nebhead/picycle
 # Replace the below command to fetch development branch
-$SUDO git clone --depth 1 --branch development https://github.com/EricPalmquist/PiCycle
+$SUDO git clone --depth 1 --branch development https://github.com/EricPalmquist/picycle
 
 # Setup Python VENV & Install Python dependencies
 clear
@@ -95,20 +95,20 @@ echo "**            (This could take several minutes)                        **"
 echo "**                                                                     **"
 echo "*************************************************************************"
 echo ""
-echo " - Setting Up PiCycle Group"
+echo " - Setting Up picycle Group"
 cd /usr/local/bin
-$SUDO groupadd PiCycle 
-$SUDO usermod -a -G PiCycle $USER 
-$SUDO usermod -a -G PiCycle root 
-# Change ownership to group=PiCycle for all files/directories in PiCycle 
-$SUDO chown -R $USER:PiCycle PiCycle 
-# Change ability for PiCycle group to read/write/execute 
-$SUDO chmod -R 775 PiCycle/
+$SUDO groupadd picycle 
+$SUDO usermod -a -G picycle $USER 
+$SUDO usermod -a -G picycle root 
+# Change ownership to group=picycle for all files/directories in picycle 
+$SUDO chown -R $USER:picycle picycle 
+# Change ability for picycle group to read/write/execute 
+$SUDO chmod -R 775 picycle/
 
 echo " - Setting up VENV"
 # Setup VENV
-python -m venv --system-site-packages PiCycle
-cd /usr/local/bin/PiCycle
+python -m venv --system-site-packages picycle
+cd /usr/local/bin/picycle
 source bin/activate 
 
 echo " - Installing module dependencies... "
@@ -170,16 +170,16 @@ echo "**      Configuring nginx...                                           **"
 echo "**                                                                     **"
 echo "*************************************************************************"
 # Move into install directory
-cd /usr/local/bin/PiCycle/auto-install/nginx
+cd /usr/local/bin/picycle/auto-install/nginx
 
 # Delete default configuration
 $SUDO rm /etc/nginx/sites-enabled/default
 
 # Copy configuration file to nginx
-$SUDO cp PiCycle.nginx /etc/nginx/sites-available/PiCycle
+$SUDO cp picycle.nginx /etc/nginx/sites-available/picycle
 
 # Create link in sites-enabled
-$SUDO ln -s /etc/nginx/sites-available/PiCycle /etc/nginx/sites-enabled
+$SUDO ln -s /etc/nginx/sites-available/picycle /etc/nginx/sites-enabled
 
 # Restart nginx
 $SUDO service nginx restart
@@ -193,7 +193,7 @@ echo "**                                                                     **"
 echo "*************************************************************************"
 
 # Copy configuration files (control.conf, webapp.conf) to supervisor config directory
-cd /usr/local/bin/PiCycle/auto-install/supervisor
+cd /usr/local/bin/picycle/auto-install/supervisor
 # Add the current username to the configuration files 
 echo "user=" $USER | tee -a control.conf > /dev/null
 echo "user=" $USER | tee -a webapp.conf > /dev/null
