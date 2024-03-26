@@ -1,0 +1,47 @@
+{% macro render_wizard_card(moduleData, moduleSection, moduleSettings) %} 
+<!-- Form for Selected Module -->
+<div class="card">
+	<div class="media">
+		<img src="{{ url_for('static', filename='img/wizard/' + moduleData['image']) }}">
+		<div class="media-body">
+			<h5 class="mt-0">{{ moduleData['friendly_name'] }}</h5>
+			<br>
+			{{ moduleData['description'] }}
+			<br>
+			{% if moduleData['notes'] %}
+			<br>
+			<span class="badge badge-warning">NOTE:</span>
+			<i class="small"> {{ moduleData['notes'] }} </i>
+			<br>
+			<br>
+			{% endif %}
+		</div>
+	</div>
+	{% if moduleData['settings_dependencies'] != {} %}
+	<table class="table">
+		<thead class="thead-light">
+			<tr>
+			<th scope="col">Setting</th>
+			<th scope="col">Options</th>
+			<th scope="col">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for setting in moduleData['settings_dependencies'] %}
+			<tr {% if moduleData['settings_dependencies'][setting]['hidden'] %} hidden {% endif %}>
+				<td>{{ moduleData['settings_dependencies'][setting]['friendly_name'] }}</td>
+				<td>
+					<select class="form-control" id="{{ moduleSection }}_{{ setting }}" name="{{ moduleSection }}_{{ setting }}">
+					{% for option in moduleData['settings_dependencies'][setting]['options'] %}
+						<option value="{{ option }}"{% if moduleSettings[setting] == option %} selected{% endif %}>{{ moduleData['settings_dependencies'][setting]['options'][option] }}</option>
+					{% endfor %}
+					</select>
+				</td>
+				<td>{{ moduleData['settings_dependencies'][setting]['description'] }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% endif %}
+</div>
+{% endmacro %}
