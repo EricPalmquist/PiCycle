@@ -1,0 +1,47 @@
+{
+    "gpio_assignments": {
+        "_comment": "_Below are gpio numbers, not pin numbers.  18 is a PCM_CLK input so might be good for the pulse input", 
+        "wheel": {
+            "comment": "18 is a PCM_CLK input so might be good for the pulse input..not sure", 
+            "pulses": 18
+        },
+        "buttons": {
+            "_comment": "erics guesses...", 
+            "up": 17,
+            "down": 27,
+            "enter": 22  
+        },
+        "display": {
+            "_comment": "copied from piFire assignments...needs vetting", 
+            "dc": 24,
+            "led": 5,
+            "rst": 25              
+        }
+    },
+    "display": {
+      "config": {
+        "st7789_240x320": {
+          "rotation": 0
+        },
+        "st7789_240x320b": {
+          "buttonslevel": "HIGH",
+          "rotation": 0
+        },
+        "st7789_240x320e": {
+          "rotation": 0
+        }
+      },
+      "selected": "none"
+    },
+    "globals": {
+      "pulse_dist_inches": 30.123,
+      "debug_mode": false,
+      "cycle_name": "Briarwood",
+      "page_theme": "light",
+      "real_hw": false,
+      "triggerlevel": "LOW",
+      "venv": false,
+      "lastupdated": 1710596531,
+      "ui_port": 5001
+    }
+  }
