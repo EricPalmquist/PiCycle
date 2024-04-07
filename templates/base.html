@@ -18,10 +18,7 @@
         <!-- Adding a Favicon -->
         <link href="{{ url_for('static', filename='img/favicon.ico') }}" rel="icon" type="image/x-icon" />
 
-        <!-- WebApp Manifest -->
-        <link rel="manifest" href="{{ url_for('manifest') }}">
-
-        <title>{% block title %}{% endblock %}{% if grill_name != '' %} | {{ grill_name }}{% endif %}</title>
+        <title>{% block title %}{% endblock %}{% if cycle_name != '' %} | {{ cycle_name }}{% endif %}</title>
 
     </head>
     <body>
@@ -30,9 +27,9 @@
 
 			<a class="navbar-brand text-truncate" {% if request.MOBILE %}style="max-width: 210px;"{% endif %} href="/">
 				<img src="{{ url_for('static', filename='img/launcher-icon-1x.png') }}" width="30" height="30" class="d-inline-block align-top" alt="">
-				<b>Pi<i class="text-danger">Fire</i></b>
-				{% if grill_name != '' %}
-					| <small class="">{{ grill_name }}</small> 
+				<b>Pi<i class="text-danger">Cycle</i></b>
+				{% if cycle_name != '' %}
+					| <small class="">{{ cycle_name }}</small> 
 				{% endif %}
 			</a>
 				
@@ -42,25 +39,12 @@
 						<i class="fas fa-bars"></i>
 					</button>
 				</div>
-				{% block timer_toggler %}
-				<div class="btn-group mr-2" role="group">
-					<button type="button" class="btn btn-outline-secondary border-secondary" id="timerButton" onclick="timerToggle()">
-						<i class="fas fa-stopwatch"></i>
-					</button>
-				</div>
-				{% endblock %}
 			</div>
 
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="nav navbar-nav mr-auto">
 					<li class="nav-item">
 						<a class="nav-link" href="/">Dashboard</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/recipes">Recipes</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/pellets">Pellet Manager</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="/history">History</a>
@@ -71,18 +55,9 @@
 					<li class="nav-item">
 						<a class="nav-link" href="/settings">Settings</a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="/admin">Admin</a>
-					</li>
 				</ul>
 			</div>
 		</nav>
-
-		{% block timer_bar %}
-			{% from '_macro_timer.html' import render_timer_bar, render_timer_modal %}
-			{{ render_timer_bar() }}
-			{{ render_timer_modal() }}
-		{% endblock %}
 
 		<div class="container theme-showcase" role="main">
 
@@ -114,43 +89,6 @@
 		</div>
 		{% block postcontainer %}{% endblock %}
 
-		{% block controlpanel %}
-			{% if settings['globals']['global_control_panel'] %}
-				<!-- Control Panel -->
-				{% from "_macro_control_panel.html" import render_container %}
-				{{ render_container(settings, control) }}
-				<!-- End Control Panel -->
-			{% endif %}
-		{% endblock %}
-
-		{% block updater_message %}
-			{% if settings is defined %}
-				{% if settings['globals']['updated_message'] %}
-				<!-- Updater Message Modal -->
-				<div class="modal fade" id="updater_message_modal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="udpate_message_title" aria-hidden="true">
-					<div class="modal-dialog modal-dialog-scrollable modal-xl">
-					<div class="modal-content">
-						<div class="modal-header">
-						<h5 class="modal-title" id="update_message_title"><i class="fa-solid fa-gift"></i>&nbsp; Update Message</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="clearMessage();">
-							<span aria-hidden="true">&times;</span>
-						</button>
-						</div>
-						<div class="modal-body">
-							<div id="update_message_html">
-							Loading...
-							</div>
-						</div>
-						<div class="modal-footer">
-						<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="clearMessage();">Close</button>
-						</div>
-					</div>
-					</div>
-				</div>
-				{% endif %}
-			{% endif %}
-		{% endblock %}
-
         <!-- Standard JavaScript -->
         <!-- jQuery --> 
         <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
@@ -158,29 +96,6 @@
         <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
         <!-- Font Awesome -->
         <script src="{{ url_for('static', filename='js/all.js') }}"></script>
-		
-		{% block timer_scripts %}
-		<!-- Timer JS -->
-		<script src="{{ url_for('static', filename='js/timer.js') }}"></script>
-		{% endblock %}
-
-		{% block controlpanel_scripts %}
-			{% if settings['globals']['global_control_panel'] %}
-				<!-- Control Panel JS -->
-				<script src="{{ url_for('static', filename='js/control_panel.js') }}"></script>
-			{% endif %}
-		{% endblock %}
-
-		{% block updater_message_scripts %}
-			{% if settings is defined %}
-				{% if settings['globals']['updated_message'] %}
-				<!-- Updater Message Scripts -->
-				<script src="{{ url_for('static', filename='js/updater_message.js') }}"></script>
-				{% endif %}
-			{% endif %}
-		{% endblock %}
-
-		{% block scripts %} {% endblock %}
 
     </body>
 </html>

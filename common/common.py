@@ -20,7 +20,7 @@ import os
 import io
 import json
 import math
-# import redis
+import redis
 # import uuid
 # import random
 import logging
@@ -35,20 +35,20 @@ from ratelimitingfilter import RateLimitingFilter
  Constants and Globals
 ==============================================================================
 '''
-BACKUP_PATH = './backups/'  # Path to backups of settings.json, pelletdb.json
+# BACKUP_PATH = './backups/'  # Path to backups of settings.json, pelletdb.json
 
 # Set of default colors for charts.  Contains list of tuples (primary color, secondary color). 
-COLOR_LIST = [
-	('rgb(0, 64, 255, 1)', 'rgb(0, 128, 255, 1)'),  # Blue
-	('rgb(0, 200, 64, 1)', 'rgb(0, 232, 126, 1)'),  # Green
-	('rgb(132, 0, 0, 1)', 'rgb(200, 0, 0, 1)'),  # Red 
-	('rgb(126, 0, 126, 1)', 'rgb(126, 64, 125, 1)'),  # Purple
-	('rgb(255, 210, 0, 1)', 'rgb(255, 255, 0, 1)'),  # Yellow
-	('rgb(255, 126, 0, 1)', 'rgb(255, 126, 64, 1)')	# Orange
-]
+# COLOR_LIST = [
+# 	('rgb(0, 64, 255, 1)', 'rgb(0, 128, 255, 1)'),  # Blue
+# 	('rgb(0, 200, 64, 1)', 'rgb(0, 232, 126, 1)'),  # Green
+# 	('rgb(132, 0, 0, 1)', 'rgb(200, 0, 0, 1)'),  # Red 
+# 	('rgb(126, 0, 126, 1)', 'rgb(126, 64, 125, 1)'),  # Purple
+# 	('rgb(255, 210, 0, 1)', 'rgb(255, 255, 0, 1)'),  # Yellow
+# 	('rgb(255, 126, 0, 1)', 'rgb(255, 126, 64, 1)')	# Orange
+# ]
 
 # Setup Command / Status database connection Global 
-# cmdsts = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
+cmdsts = redis.StrictRedis('localhost', 6379, charset="utf-8", decode_responses=True)
 
 
 '''
@@ -71,7 +71,7 @@ def create_logger(name, filename='./logs/picycle.log', messageformat='%(asctime)
 		# Add a rate limit filter for the voltage error logging 
 		config = {'match': ['An error occurred reading the voltage from one of the ports.']}
 		ratelimit = RateLimitingFilter(rate=1, per=60, burst=5, **config)  # Allow 1 per 60s (with periodic burst of 5)
-		handler = logging.FileHandler(filename)        
+		handler = logging.FileHandler(filename)		
 		handler.setFormatter(formatter)
 		handler.addFilter(ratelimit)  # Add the rate limit filter
 		logger.addHandler(handler)
@@ -180,7 +180,7 @@ def create_logger(name, filename='./logs/picycle.log', messageformat='%(asctime)
 	# settings['pwm'] = {
 	# 	'pwm_control': False,
 	# 	'update_time' : 10,
-	# 	'frequency' : 25000,    # PWM Fan Frequency. Intel 4-wire PWM spec specifies 25 kHz
+	# 	'frequency' : 25000,	# PWM Fan Frequency. Intel 4-wire PWM spec specifies 25 kHz
 	# 	'min_duty_cycle' : 20, 	# This is the minimum duty cycle that can be set. Some fans stall below a certain speed
 	# 	'max_duty_cycle' : 100, # This is the maximum duty cycle that can be set. Can limit fans that are overpowered
 	# 	'temp_range_list' : [3, 7, 10, 15],  # Temp Bands for Each Profile
@@ -323,85 +323,19 @@ def create_logger(name, filename='./logs/picycle.log', messageformat='%(asctime)
 
 # 	return config
 
-# def default_control():
-# 	settings = read_settings()
+def default_control():
+	settings = read_settings()
+	control = {}
+	control['curr_speed'] = 0.0
+	control['avg_speed'] = 0.0
+	control['distance'] = 0.0
+	control['mode'] = 'Stop'
+	control['next_mode'] = 'Stop'
+	control['status'] = ''
+	control['errors'] = []
+	control['system'] = {}
 
-# 	control = {}
-
-# 	control['updated'] = True
-
-# 	control['mode'] = 'Stop'
-
-# 	control['next_mode'] = 'Stop'
-
-# 	control['s_plus'] = settings['smoke_plus']['enabled'] 		# Smoke-Plus Feature Enable/Disable
-
-# 	control['pwm_control'] = settings['pwm']['pwm_control'] 	# Temp Fan Control Enable/Disable
-
-# 	control['duty_cycle'] = settings['pwm']['max_duty_cycle'] 	# Set PWM Fan Duty Cycle
-
-# 	control['hopper_check'] = False 	# Trigger a synchronous hopper level check
-
-# 	control['recipe'] = {
-# 		'filename' : '',
-# 		'start_step' : 0,
-# 		'step' : 0,
-# 		'step_data' : {}
-# 	}
-
-# 	control['status'] = ''
-
-# 	control['probe_profile_update'] = False
-
-# 	control['settings_update'] = False
-
-# 	control['distance_update'] = False
-
-# 	control['units_change'] = False  	# Used to indicate that a units change has been requested
-
-# 	control['tuning_mode'] = False  	# Used to set tuning mode enabled so Tr values will be recorded (False by default)
-
-# 	control['safety'] = {
-# 		'startuptemp' : 0, 		# Set by control function at startup
-# 		'afterstarttemp' : 0, 	# Set by control function during startup
-# 		'reigniteretries' : settings['safety']['reigniteretries'], # Set by user to attempt a re-ignite when the grill drops below a certain temp
-# 		'reignitelaststate' : 'Smoke' # Set by control function to remember the last state we were in when the temp dropped below safety levels
-# 	}
-
-# 	control['primary_setpoint'] = 0		# Setpoint Temperature for Primary Probe (i.e. Grill Probe)
-
-# 	control['notify_data'] = default_notify(settings)
-
-# 	control['timer'] = {
-# 		'start' : 0,
-# 		'paused' : 0,
-# 		'end' : 0,
-# 		'shutdown' : False 
-# 	}
-
-# 	control['manual'] = {
-# 		'change' : False,
-# 		'fan' : False,
-# 		'auger' : False,
-# 		'igniter' : False,
-# 		'power' : False,
-# 		'pwm' : 100
-# 	}
-
-# 	control['errors'] = []
-
-# 	control['smartstart'] = {
-# 		'startuptemp' : 0,
-# 		'profile_selected' : 0
-# 	}
-
-# 	control['prime_amount'] = 10  # Default Prime Amount in Grams
-
-# 	control['startup_timestamp'] = 0  # Timestamp of startup, used for cook time
-
-# 	control['system'] = {}
-
-# 	return(control)
+	return(control)
 
 # """
 # List of Tuples ('metric_key', default_value)
@@ -441,60 +375,48 @@ def create_logger(name, filename='./logs/picycle.log', messageformat='%(asctime)
 
 # 	return(metrics)
 
-# def generate_uuid():
-# 	"""
-# 	Generate a uuid based on mac address and random int
+def read_control(flush=False):
+	"""
+	Read Control from Redis DB
 
-# 	:return: A string uuid
-# 	"""
-# 	node = uuid.getnode()
-# 	rand_int = random.randint(100, 200)
-# 	generated_uuid = uuid.uuid1(node + rand_int)
+	:param flush: True to clean control. False otherwise
+	:return: control
+	"""
+	global cmdsts
 
-# 	return str(generated_uuid)
+	try:
+		if flush:
+			# Remove all control structures in Redis DB (not history or current)
+			cmdsts.delete('control:general')
+			#cmdsts.delete('control:command')
+			# The following set's no persistence so that we don't get writes to the disk / SDCard 
+			cmdsts.config_set('appendonly', 'no')
+			cmdsts.config_set('save', '')
 
-# def read_control(flush=False):
-# 	"""
-# 	Read Control from Redis DB
+			control = default_control()
+			write_control(control, direct_write=True, origin='common')
+		else: 
+			control = json.loads(cmdsts.get('control:general'))
+	except:
+		control = default_control()
 
-# 	:param flush: True to clean control. False otherwise
-# 	:return: control
-# 	"""
-# 	global cmdsts
+	return(control)
 
-# 	try:
-# 		if flush:
-# 			# Remove all control structures in Redis DB (not history or current)
-# 			cmdsts.delete('control:general')
-# 			cmdsts.delete('control:command')
-# 			# The following set's no persistence so that we don't get writes to the disk / SDCard 
-# 			cmdsts.config_set('appendonly', 'no')
-# 			cmdsts.config_set('save', '')
+def write_control(control, direct_write=False, origin='unknown'):
+	"""
+	Write Control to Redis DB
 
-# 			control = default_control()
-# 			write_control(control, direct_write=True, origin='common')
-# 		else: 
-# 			control = json.loads(cmdsts.get('control:general'))
-# 	except:
-# 		control = default_control()
+	:param control: Control Dictionary
+	:param direct_write:  If set to true, write directly to the control data.  Else, write the control data to a command queue.  Defaults to false.  
+	"""
+	global cmdsts
 
-# 	return(control)
-
-# def write_control(control, direct_write=False, origin='unknown'):
-# 	"""
-# 	Read Control from Redis DB
-
-# 	:param control: Control Dictionary
-# 	:param direct_write:  If set to true, write directly to the control data.  Else, write the control data to a command queue.  Defaults to false.  
-# 	"""
-# 	global cmdsts
-
-# 	if direct_write: 
-# 		cmdsts.set('control:general', json.dumps(control))
-# 	else: 
-# 		# Add changes to control write queue 
-# 		control['origin'] = origin 
-# 		cmdsts.rpush('control:write', json.dumps(control))
+	if direct_write: 
+		cmdsts.set('control:general', json.dumps(control))
+	else: 
+		# Add changes to control write queue 
+		control['origin'] = origin 
+		cmdsts.rpush('control:write', json.dumps(control))
 
 # def execute_control_writes():
 # 	"""
@@ -515,74 +437,74 @@ def create_logger(name, filename='./logs/picycle.log', messageformat='%(asctime)
 # 		write_control(control, direct_write=True, origin='writer')
 # 	return status
 
-# def read_errors(flush=False):
-# 	"""
-# 	Read Errors from Redis DB
+def read_errors(flush=False):
+	"""
+	Read Errors from Redis DB
 
-# 	:param flush: True to clear errors. False otherwise
-# 	:return: errors
-# 	"""
-# 	global cmdsts
+	:param flush: True to clear errors. False otherwise
+	:return: errors
+	"""
+	global cmdsts
 
-# 	try:
-# 		if flush:
-# 			# Remove all error structures in Redis DB
-# 			cmdsts.delete('errors')
+	try:
+		if flush:
+			# Remove all error structures in Redis DB
+			cmdsts.delete('errors')
 
-# 			errors = []
-# 			write_errors(errors)
-# 		else: 
-# 			errors = json.loads(cmdsts.get('errors'))
-# 	except:
-# 		errors = ['Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.']
+			errors = []
+			write_errors(errors)
+		else: 
+			errors = json.loads(cmdsts.get('errors'))
+	except:
+		errors = ['Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.']
 
-# 	return(errors)
+	return(errors)
 
-# def write_errors(errors):
-# 	"""
-# 	Write Errors to Redis DB
+def write_errors(errors):
+	"""
+	Write Errors to Redis DB
 
-# 	:param errors: Errors
-# 	"""
-# 	global cmdsts
+	:param errors: Errors
+	"""
+	global cmdsts
 
-# 	cmdsts.set('errors', json.dumps(errors))
+	cmdsts.set('errors', json.dumps(errors))
 
-# def read_warnings():
-# 	"""
-# 	Read Warnings from Redis DB and then burn them
+def read_warnings():
+	"""
+	Read Warnings from Redis DB and then burn them
 
-# 	:return: warnings
-# 	"""
-# 	global cmdsts
+	:return: warnings
+	"""
+	global cmdsts
 
-# 	try:
-# 		if not(cmdsts.exists('warnings')):
-# 			warnings = []
-# 		else:
-# 			# Read list of warnings 
-# 			warnings = cmdsts.lrange('warnings', 0, -1)
-# 			# Remove all warnings in Redis DB
-# 			cmdsts.delete('warnings')
-# 	except:
-# 		warnings = ['Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.']
-# 		write_log(warnings[0])
+	try:
+		if not(cmdsts.exists('warnings')):
+			warnings = []
+		else:
+			# Read list of warnings 
+			warnings = cmdsts.lrange('warnings', 0, -1)
+			# Remove all warnings in Redis DB
+			cmdsts.delete('warnings')
+	except:
+		warnings = ['Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.']
+		write_log(warnings[0])
 
-# 	return warnings
+	return warnings
 
-# def write_warning(warning):
-# 	"""
-# 	Write a warning to Redis DB
+def write_warning(warning):
+	"""
+	Write a warning to Redis DB
 
-# 	:param warnings: Warnings List 
-# 	"""
-# 	global cmdsts
+	:param warnings: Warnings List 
+	"""
+	global cmdsts
 
-# 	try:
-# 		cmdsts.rpush('warnings', warning)
-# 	except:
-# 		event = 'Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.'
-# 		write_log(event)
+	try:
+		cmdsts.rpush('warnings', warning)
+	except:
+		event = 'Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.'
+		write_log(event)
 
 # def read_metrics(all=False):
 # 	"""
@@ -666,7 +588,7 @@ def read_settings(filename='settings.json', init=False, retry_count=0):
 			settings = read_settings(filename=filename, retry_count=retry_count+1)
 		else:
 			pass
-            #""" Undefined settings file load error, indicates corruption """
+			#""" Undefined settings file load error, indicates corruption """
 			# settings_default = default_settings()
 			# settings = restore_settings(settings_default)
 			# init = True
@@ -726,18 +648,18 @@ def read_settings(filename='settings.json', init=False, retry_count=0):
 
 	return(settings)
 
-def write_settings(settings):
-	"""
-	Write all settings to JSON file
+# def write_settings(settings):
+# 	"""
+# 	Write all settings to JSON file
 
-	:param settings: Settings
+# 	:param settings: Settings
 
-	"""
-	settings['settings']['lastupdated'] = math.trunc(time.time())
+# 	"""
+# 	settings['settings']['lastupdated'] = math.trunc(time.time())
 
-	json_data_string = json.dumps(settings, indent=2, sort_keys=True)
-	with open("settings.json", 'w') as settings_file:
-		settings_file.write(json_data_string)
+# 	json_data_string = json.dumps(settings, indent=2, sort_keys=True)
+# 	with open("settings.json", 'w') as settings_file:
+# 		settings_file.write(json_data_string)
 
 # def backup_settings():
 # 	# Copy current settings file to a backup copy in /[BACKUP_PATH]/PiCycle_[DATE]_[TIME].json 
@@ -863,92 +785,92 @@ def write_settings(settings):
 # 	write_log(warning)
 # 	return(settings)
 
-def read_events(legacy=True):
-	"""
-	Read event.log and populate an array of events.
+# def read_events(legacy=True):
+# 	"""
+# 	Read event.log and populate an array of events.
 
-	if legacy=true:
-	:return: (event_list, num_events)
+# 	if legacy=true:
+# 	:return: (event_list, num_events)
 
-	if legacy=false:
-	:return: (event_list, num_events)
-	"""
-	# Read all lines of events.log into a list(array)
-	try:
-		with open('/tmp/events.log') as event_file:
-			event_lines = event_file.readlines()
-			event_file.close()
-	# If file not found error, then create events.log file
-	except(IOError, OSError):
-		event_file = open('/tmp/events.log', "w")
-		event_file.close()
-		event_lines = []
+# 	if legacy=false:
+# 	:return: (event_list, num_events)
+# 	"""
+# 	# Read all lines of events.log into a list(array)
+# 	try:
+# 		with open('/tmp/events.log') as event_file:
+# 			event_lines = event_file.readlines()
+# 			event_file.close()
+# 	# If file not found error, then create events.log file
+# 	except(IOError, OSError):
+# 		event_file = open('/tmp/events.log', "w")
+# 		event_file.close()
+# 		event_lines = []
 
-	# Initialize event_list list
-	event_list = []
+# 	# Initialize event_list list
+# 	event_list = []
 
-	# Get number of events
-	num_events = len(event_lines)
+# 	# Get number of events
+# 	num_events = len(event_lines)
 
-	if legacy:
-		for x in range(num_events):
-			event_list.insert(0, event_lines[x].split(" ",2))
+# 	if legacy:
+# 		for x in range(num_events):
+# 			event_list.insert(0, event_lines[x].split(" ",2))
 
-		# Error handling if number of events is less than 10, fill array with empty
-		if num_events < 10:
-			for line in range((10-num_events)):
-				event_list.append(["--------","--:--:--","---"])
-			num_events = 10
-	else:
-		for x in range(num_events):
-			event_list.append(event_lines[x].split(" ",2))
-		return event_list
+# 		# Error handling if number of events is less than 10, fill array with empty
+# 		if num_events < 10:
+# 			for line in range((10-num_events)):
+# 				event_list.append(["--------","--:--:--","---"])
+# 			num_events = 10
+# 	else:
+# 		for x in range(num_events):
+# 			event_list.append(event_lines[x].split(" ",2))
+# 		return event_list
 
-	return(event_list, num_events)
+# 	return(event_list, num_events)
 
-def read_log_file(filepath):
-	# Read all lines of events.log into a list(array)
-	try:
-		with open(filepath) as log_file:
-			log_file_lines = log_file.readlines()
-			log_file.close()
-	# If file not found error, then create events.log file
-	except(IOError, OSError):
-		event = f'Unable to open log file: {filepath}'
-		write_log(event)
-		return []
+# def read_log_file(filepath):
+# 	# Read all lines of events.log into a list(array)
+# 	try:
+# 		with open(filepath) as log_file:
+# 			log_file_lines = log_file.readlines()
+# 			log_file.close()
+# 	# If file not found error, then create events.log file
+# 	except(IOError, OSError):
+# 		event = f'Unable to open log file: {filepath}'
+# 		write_log(event)
+# 		return []
 
-	return log_file_lines 
+# 	return log_file_lines 
 
-def add_line_numbers(event_list):
-	event_lines = []
-	for index, line in enumerate(event_list):
-		event_lines.append([index, line])
-	return event_lines 
+# def add_line_numbers(event_list):
+# 	event_lines = []
+# 	for index, line in enumerate(event_list):
+# 		event_lines.append([index, line])
+# 	return event_lines 
 
-def write_log(event):
-	"""
-	Write event to event.log
+# def write_log(event):
+# 	"""
+# 	Write event to event.log
 
-	:param event: String event
-	"""
-	log_level = logging.INFO
-	eventLogger = create_logger('events', filename='/tmp/events.log', messageformat='%(asctime)s [%(levelname)s] %(message)s', level=log_level)
-	eventLogger.info(event)
+# 	:param event: String event
+# 	"""
+# 	log_level = logging.INFO
+# 	eventLogger = create_logger('events', filename='/tmp/events.log', messageformat='%(asctime)s [%(levelname)s] %(message)s', level=log_level)
+# 	eventLogger.info(event)
 
-def write_event(settings, event):
-	"""
-	Send event to log and console if debug mode enabled or only to log if
-	string does not begin with *
+# def write_event(settings, event):
+# 	"""
+# 	Send event to log and console if debug mode enabled or only to log if
+# 	string does not begin with *
 
-	:param settings: Settings
-	:param event: String event
-	"""
-	if settings['globals']['debug_mode']:
-		print(event)
-		write_log(event)
-	elif not event.startswith('*'):
-		write_log(event)
+# 	:param settings: Settings
+# 	:param event: String event
+# 	"""
+# 	if settings['globals']['debug_mode']:
+# 		print(event)
+# 		write_log(event)
+# 	elif not event.startswith('*'):
+# 		write_log(event)
 
 # def read_history(num_items=0, flushhistory=False):
 # 	"""
@@ -1337,7 +1259,7 @@ def read_generic_json(filename):
 	except: 
 		dictionary = {}
 		event = f'An error occurred loading {filename}'
-		write_log(event)
+		#write_log(event)
 
 	return dictionary
 
@@ -1348,7 +1270,7 @@ def write_generic_json(dictionary, filename):
 			json_file.write(json_data_string)
 	except:
 		event = f'Error writing generic json file ({filename})'
-		write_log(event)
+		#write_log(event)
 
 # def write_status(status):
 # 	"""
