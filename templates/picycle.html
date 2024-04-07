@@ -1,0 +1,12 @@
+{% extends 'base.html' %} 
+
+{% block title %}Dashboard{% endblock %} 
+
+{% block content %}
+<br>
+<H2>PI Cycle is here!</H2>
+<i>Distance={{ control['distance'] | round(1) }} miles.</i> <br>
+<i>Current Speed={{ control['curr_speed'] | round(1) }} mph.</i> <br>
+<i>Average Speed={{ control['avg_speed'] | round(1) }} mph.</i> <br>
+<br>
+{% endblock %}

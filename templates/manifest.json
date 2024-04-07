@@ -1,6 +1,6 @@
 {
-  "short_name": "PiFire",
-  "name": "PiFire - Pellet Smoker Controller",
+  "short_name": "PiCycle",
+  "name": "PiCycle - Stationary Bike Computer",
   "icons": [
     {
       "src": "{{ url_for('static', filename='img/launcher-icon-2x.png') }}",

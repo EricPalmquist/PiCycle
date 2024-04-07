@@ -2,11 +2,11 @@
 
 # Automatic Installation Script
 # Many thanks to the PiVPN project (pivpn.io) for much of the inspiration for this script
-# Run from https://raw.githubusercontent.com/nebhead/picycle/master/auto-install/install.sh
+# Run from https://raw.githubusercontent.com/EricPalmquist/picycle/master/auto-install/install.sh
 #
 # Install with this command (from your Pi):
 #
-# curl https://raw.githubusercontent.com/nebhead/picycle/master/auto-install/install.sh | bash
+# curl https://raw.githubusercontent.com/EricPalmquist/picycle/master/auto-install/install.sh | bash
 #
 # NOTE: Pre-Requisites to run Raspi-Config first.  See README.md.
 
@@ -74,17 +74,17 @@ echo "*************************************************************************"
 $SUDO apt install python3-dev python3-pip python3-venv python3-rpi.gpio python3-scipy nginx git supervisor ttf-mscorefonts-installer redis-server libatlas-base-dev libopenjp2-7 -y
 
 # Grab project files
-clear
-echo "*************************************************************************"
-echo "**                                                                     **"
-echo "**      Cloning picycle from GitHub...                                  **"
-echo "**                                                                     **"
-echo "*************************************************************************"
-cd /usr/local/bin
+# clear
+# echo "*************************************************************************"
+# echo "**                                                                     **"
+# echo "**      Cloning picycle from GitHub...                                  **"
+# echo "**                                                                     **"
+# echo "*************************************************************************"
+# cd /usr/local/bin
 # Use a shallow clone to reduce download size
-#$SUDO git clone --depth 1 https://github.com/nebhead/picycle
+#$SUDO git clone --depth 1 https://github.com/EricPalmquist/picycle
 # Replace the below command to fetch development branch
-$SUDO git clone --depth 1 --branch development https://github.com/EricPalmquist/picycle
+#$SUDO git clone --depth 1 --branch development https://github.com/EricPalmquist/picycle
 
 # Setup Python VENV & Install Python dependencies
 clear
@@ -112,7 +112,7 @@ cd /usr/local/bin/picycle
 source bin/activate 
 
 echo " - Installing module dependencies... "
-# Install module dependencies 
+#Install module dependencies 
 python -m pip install "flask==2.3.3" 
 python -m pip install flask-mobility
 python -m pip install flask-qrcode
@@ -125,17 +125,13 @@ else
     python -m pip install eventlet
 fi      
 python -m pip install gunicorn
-python -m pip install gpiozero
+#python -m pip install gpiozero
 python -m pip install redis
-python -m pip install uuid
+#python -m pip install uuid
 #python -m pip install influxdb-client[ciso]
-#python -m pip install apprise
-#python -m pip install scikit-fuzzy
-#python -m pip install scikit-learn
-#python -m pip install ratelimitingfilter
-python -m pip install "pillow>=9.2.0"
-#python -m pip install paho-mqtt
-python -m pip install psutil
+python -m pip install ratelimitingfilter
+#python -m pip install "pillow>=9.2.0"
+#python -m pip install psutil
 
 # Setup config.txt to enable busses 
 clear
@@ -145,15 +141,13 @@ echo "**      Configuring config.txt                                         **"
 echo "**                                                                     **"
 echo "*************************************************************************"
 
-# Enable SPI - Needed for some displays
+Enable SPI - Needed for some displays
 echo "dtparam=spi=on" | $SUDO tee -a /boot/config.txt > /dev/null
-# Enable I2C - Needed for some displays, ADCs, distance sensors
-echo "dtparam=i2c_arm=on" | $SUDO tee -a /boot/config.txt > /dev/null
-echo "i2c-dev" | $SUDO tee -a /etc/modules > /dev/null
-# Enable Hardware PWM - Needed for hardware PWM support 
-#echo "dtoverlay=pwm,pin=13,func=4" | $SUDO tee -a /boot/config.txt > /dev/null
+#Enable I2C - Needed for some displays, ADCs, distance sensors
+#echo "dtparam=i2c_arm=on" | $SUDO tee -a /boot/config.txt > /dev/null
+#echo "i2c-dev" | $SUDO tee -a /etc/modules > /dev/null
 
-# Setup backlight / power permissions if a DSI screen is installed  
+Setup backlight / power permissions if a DSI screen is installed  
 clear
 echo "*************************************************************************"
 echo "**                                                                     **"
@@ -162,7 +156,7 @@ echo "**                                                                     **"
 echo "*************************************************************************"
 echo 'SUBSYSTEM=="backlight",RUN+="/bin/chmod 666 /sys/class/backlight/%k/brightness /sys/class/backlight/%k/bl_power"' | $SUDO tee -a /etc/udev/rules.d/backlight-permissions.rules > /dev/null
 
-### Setup nginx to proxy to gunicorn
+## Setup nginx to proxy to gunicorn
 clear
 echo "*************************************************************************"
 echo "**                                                                     **"
