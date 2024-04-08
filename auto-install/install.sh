@@ -84,7 +84,7 @@ $SUDO apt install python3-dev python3-pip python3-venv python3-rpi.gpio python3-
 # Use a shallow clone to reduce download size
 #$SUDO git clone --depth 1 https://github.com/EricPalmquist/picycle
 # Replace the below command to fetch development branch
-#$SUDO git clone --depth 1 --branch development https://github.com/EricPalmquist/picycle
+$SUDO git clone --depth 1 --branch development https://github.com/EricPalmquist/picycle
 
 # Setup Python VENV & Install Python dependencies
 clear
