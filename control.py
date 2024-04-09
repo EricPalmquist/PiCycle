@@ -37,9 +37,8 @@ controlLogger = create_logger('control', filename='./logs/control.log', messagef
 eventLogger = create_logger('events', filename='/tmp/events.log', messageformat='%(asctime)s [%(levelname)s] %(message)s', level=log_level)
 
 # Flush Redis DB and create JSON structure
-control = read_control(flush=True)
-
-eventLogger.info('Flushing Redis DB and creating new control structure')
+current = read_control(flush=True)
+eventLogger.info('Flushing Redis DB and creating new current structure')
 
 '''
 Set up our speed reader class object - use the prototype or real based on settings file
@@ -84,13 +83,12 @@ def _ride_cycle():
 
 		time.sleep(5)
 
-		control['curr_speed'] = speed_input.curr_speed()
-		control['avg_speed'] = speed_input.avg_speed()
-		control['distance'] = speed_input.distance()
-		control['mode'] = 'Riding'
-		control['next_mode'] = 'Riding'
+		current['curr_speed'] = speed_input.curr_speed()
+		current['avg_speed'] = speed_input.avg_speed()
+		current['distance'] = speed_input.distance()
+		current['mode'] = 'Riding'
 
-		write_control(control, direct_write=True, origin='control')
+		write_current(current)
 		
 		#controlLogger.debug(f'Current Speed={speed_input.curr_speed()} mph, Average Speed={speed_input.avg_speed()}, Dist={speed_input.distance()}')
 		print(f'Current Speed={speed_input.curr_speed()} mph, Average Speed={speed_input.avg_speed()}, Dist={speed_input.distance()}')

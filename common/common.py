@@ -959,60 +959,50 @@ def write_settings(settings):
 # 		cmdsts.lpop('control:history')
 
 
-# def write_current(in_data):
-# 	"""
-# 	Write current and populate a dictionary of data
+def write_current(in_data):
+	"""
+	Write current and populate a dictionary of data
 
-# 	:param in_data: dictionary containing current temperatures
-# 	"""
-# 	global cmdsts
+	:param in_data: dictionary containing current ride info
+	"""
+	global cmdsts
 
-# 	current = {}
-# 	current['P'] = in_data['probe_history']['primary']
-# 	current['F'] = in_data['probe_history']['food']
-# 	current['AUX'] = in_data['probe_history']['aux']
-# 	current['PSP'] = in_data['primary_setpoint']
-# 	current['NT'] = in_data['notify_targets']
-# 	current['TS'] = int(time.time() * 1000)  # Timestamp
-# 	cmdsts.set('control:current', json.dumps(current))
+	current = {}
+	current['curr_speed'] = in_data['curr_speed']
+	current['avg_speed'] = in_data['avg_speed']
+	current['distance'] = in_data['distance']
+	current['mode'] = in_data['mode']
+	current['timestamp'] = int(time.time() * 1000) 
 
-# def read_current(zero_out=False):
-# 	"""
-# 	Read current.log and populate a list of data
+	cmdsts.set('control:current', json.dumps(current))
 
-# 	:param zero_out: True to zero out current. False otherwise
-# 	:return: Current probe temps structure
-# 	"""
-# 	global cmdsts
+def read_current(zero_out=False):
+	"""
+	Read current and populate a list of data
 
-# 	if zero_out:
-# 		''' Build Probe Structure '''
-# 		settings = read_settings()
-# 		current = {
-# 			'P' : {}, 
-# 			'F' : {},
-# 			'PSP' : 0,
-# 			'NT' : {},
-# 			'AUX' : {}
-# 		}
+	:param zero_out: True to zero out current. False otherwise
+	:return: Current probe temps structure
+	"""
+	global cmdsts
 
-# 		for probe in settings['probe_settings']['probe_map']['probe_info']:
-# 			if probe['type'] == 'Primary':
-# 				current['P'][probe['label']] = 0
-# 			if probe['type'] == 'Food':
-# 				current['F'][probe['label']] = 0
-# 			if probe['type'] == 'Aux':
-# 				current['AUX'][probe['label']] = 0
-# 			current['NT'][probe['label']] = 0
+	if zero_out:
+		settings = read_settings()
+		current = {
+			'curr_speed' : 0, 
+			'avg_speed' : 0,
+			'distance' : 0,
+			'mode' : 0,
+			'timestamp' : 0
+		}
 
-# 		cmdsts.set('control:current', json.dumps(current))
+		cmdsts.set('control:current', json.dumps(current))
 
-# 	if not cmdsts.exists('control:current'):
-# 		current = {}
-# 	else:
-# 		current = json.loads(cmdsts.get('control:current'))
+	if not cmdsts.exists('control:current'):
+		current = {}
+	else:
+		current = json.loads(cmdsts.get('control:current'))
 	
-# 	return(current)
+	return(current)
 
 # def prepare_csv(data=[], filename=''):
 # 	# Create filename if no name specified

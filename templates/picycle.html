@@ -5,8 +5,38 @@
 {% block content %}
 <br>
 <H2>PI Cycle is here!</H2>
-<i>Distance={{ control['distance'] | round(1) }} miles.</i> <br>
-<i>Current Speed={{ control['curr_speed'] | round(1) }} mph.</i> <br>
-<i>Average Speed={{ control['avg_speed'] | round(1) }} mph.</i> <br>
+
+<div id="distance"></div>
+<div id="curr_speed"></div>
+<div id="avg_speed"></div>
+
+
 <br>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        function updateValue() {
+            $.ajax({
+                url: '/api/current',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var current = data.current;
+
+                    $('#distance').html('Distance=' + current.distance);
+                    $('#curr_speed').html('Current Speed=' + current.curr_speed);
+                    $('#avg_speed').html('Average Speed=' + current.avg_speed);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error:", textStatus, errorThrown);
+                }
+            });
+        }
+
+        // Update initially and then every 10 seconds
+        updateValue();
+        setInterval(updateValue, 10000);
+    });
+</script>
 {% endblock %}
