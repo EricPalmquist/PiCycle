@@ -648,18 +648,18 @@ def read_settings(filename='settings.json', init=False, retry_count=0):
 
 	return(settings)
 
-# def write_settings(settings):
-# 	"""
-# 	Write all settings to JSON file
+def write_settings(settings):
+	"""
+	Write all settings to JSON file
 
-# 	:param settings: Settings
+	:param settings: Settings
 
-# 	"""
-# 	settings['settings']['lastupdated'] = math.trunc(time.time())
+	"""
+	settings['globals']['lastupdated'] = math.trunc(time.time())
 
-# 	json_data_string = json.dumps(settings, indent=2, sort_keys=True)
-# 	with open("settings.json", 'w') as settings_file:
-# 		settings_file.write(json_data_string)
+	json_data_string = json.dumps(settings, indent=2, sort_keys=True)
+	with open("settings.json", 'w') as settings_file:
+		settings_file.write(json_data_string)
 
 # def backup_settings():
 # 	# Copy current settings file to a backup copy in /[BACKUP_PATH]/PiCycle_[DATE]_[TIME].json 

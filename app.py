@@ -73,6 +73,64 @@ def dash():
  						   control=control,
 						   page_theme=settings['globals']['page_theme'],
 						   cycle_name=settings['globals']['cycle_name'])
+
+@app.route('/settings/<action>', methods=['POST','GET'])
+@app.route('/settings', methods=['POST','GET'])
+def settings_page(action=None):
+
+	global settings
+	#control = read_control()
+	
+	# When someone clicks SAVE the settings global form we will land here
+	if request.method == 'POST' and action == 'global':
+		response = request.form
+
+		if _is_checked(response, 'debug_mode'):
+			settings['globals']['debug_mode'] = True
+		else:
+			settings['globals']['debug_mode'] = False
+		
+		if _is_checked(response, 'real_hw'):
+			settings['globals']['real_hw'] = True
+		else:
+			settings['globals']['real_hw'] = False
+		
+		if _is_checked(response, 'darkmode'):
+			settings['globals']['page_theme'] = 'dark'
+		else:
+			settings['globals']['page_theme'] = 'light'		
+		
+		if _is_not_blank(response, 'wheel_rad_inches'):
+			settings['globals']['wheel_rad_inches'] = response['wheel_rad_inches']
+		
+		if _is_not_blank(response, 'ui_port'):
+			settings['globals']['ui_port'] = int(response['ui_port'])
+		
+		if _is_not_blank(response, 'cycle_name'):
+			settings['globals']['cycle_name'] = response['cycle_name']
+
+		#control['settings_update'] = True
+
+		write_settings(settings)
+		#write_control(control, origin='app')
+
+	return render_template('settings.html',
+						   settings=settings,
+						   page_theme=settings['globals']['page_theme'],
+						   cycle_name=settings['globals']['cycle_name'])
+
+'''
+==============================================================================
+ Supporting Functions
+==============================================================================
+'''
+
+def _is_not_blank(response, setting):
+	return setting in response and setting != ''
+
+def _is_checked(response, setting):
+	return setting in response and response[setting] == 'on'
+
 '''
 ==============================================================================
  Main Program Start
