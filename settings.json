@@ -1,61 +1,61 @@
 {
-    "dashboard": {
-        "current": "Basic",
-        "dashboards": {
-          "Basic": {
-            "config": {},
-            "custom": {
-              "hidden_cards": []
-            },
-            "friendly_name": "Basic Dashboard",
-            "html_name": "dash_basic.html",
-            "name": "Basic"
-          },
-          "Default": {
-            "config": {},
-            "custom": {
-              "hidden_cards": []
-            },
-            "friendly_name": "Default Dashboard",
-            "html_name": "dash_default.html",
-            "name": "Default"
-          }
-        }
+  "dashboard": {
+    "current": "Basic",
+    "dashboards": {
+      "Basic": {
+        "config": {},
+        "custom": {
+          "hidden_cards": []
+        },
+        "friendly_name": "Basic Dashboard",
+        "html_name": "dash_basic.html",
+        "name": "Basic"
       },
+      "Default": {
+        "config": {},
+        "custom": {
+          "hidden_cards": []
+        },
+        "friendly_name": "Default Dashboard",
+        "html_name": "dash_default.html",
+        "name": "Default"
+      }
+    }
+  },
+  "display": {
+    "selected": "st7789_240x320b",
+    "st7789_240x320b": {
+      "buttonslevel": "HIGH",
+      "rotation": 0
+    }
+  },
+  "globals": {
+    "cycle_name": "PC Bike Sim",
+    "debug_mode": true,
+    "lastupdated": 1712623870,
+    "page_theme": "dark",
+    "real_hw": false,
+    "ui_port": 5001,
+    "venv": true,
+    "wheel_rad_inches": "9.876"
+  },
+  "gpio_assignments": {
+    "_comment": "_Below are gpio numbers, not pin numbers.  18 is a PCM_CLK input so might be good for the pulse input",
+    "buttons": {
+      "_comment": "erics guesses...",
+      "down": 27,
+      "enter": 22,
+      "up": 17
+    },
     "display": {
-        "st7789_240x320b": {
-          "buttonslevel": "HIGH",
-          "rotation": 0
-        },
-        "selected": "st7789_240x320b"
+      "_comment": "copied from piFire assignments...needs vetting",
+      "dc": 24,
+      "led": 5,
+      "rst": 25
     },
-    "globals": {
-      "wheel_rad_inches": 12.345,
-      "debug_mode": false,
-      "cycle_name": "My Bike!",
-      "page_theme": "light",
-      "real_hw": false,
-      "venv": true,
-      "lastupdated": 1710596531,
-      "ui_port": 5001
-    },
-    "gpio_assignments": {
-        "_comment": "_Below are gpio numbers, not pin numbers.  18 is a PCM_CLK input so might be good for the pulse input", 
-        "wheel": {
-            "comment": "18 is a PCM_CLK input so might be good for the pulse input..not sure", 
-            "pulses": 18
-        },
-        "buttons": {
-            "_comment": "erics guesses...", 
-            "up": 17,
-            "down": 27,
-            "enter": 22  
-        },
-        "display": {
-            "_comment": "copied from piFire assignments...needs vetting", 
-            "dc": 24,
-            "led": 5,
-            "rst": 25              
-        }
+    "wheel": {
+      "comment": "18 is a PCM_CLK input so might be good for the pulse input..not sure",
+      "pulses": 18
     }
   }
+}
