@@ -170,6 +170,6 @@ ui_port = int(settings['globals']['ui_port'])
 
 if __name__ == '__main__':
 	if is_real_hardware():
-		socketio.run(app, host='0.0.0.0')
+		socketio.run(app, host='0.0.0.0', port=ui_port)
 	else:
 		socketio.run(app, host='0.0.0.0', debug=True)

@@ -24,9 +24,9 @@
                 success: function(data) {
                     var current = data.current;
 
-                    $('#distance').html('Distance=' + current.distance);
-                    $('#curr_speed').html('Current Speed=' + current.curr_speed);
-                    $('#avg_speed').html('Average Speed=' + current.avg_speed);
+                    $('#distance').html('Distance = ' + current.distance.toFixed(2) + ' mi');
+                    $('#curr_speed').html('Current Speed = ' + current.curr_speed.toFixed(2) + ' mph');
+                    $('#avg_speed').html('Average Speed = ' + current.avg_speed.toFixed(2) + ' mph');
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.error("Error:", textStatus, errorThrown);

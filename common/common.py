@@ -24,7 +24,7 @@ import redis
 # import uuid
 # import random
 import logging
-#from collections.abc import Mapping
+from collections.abc import Mapping
 from ratelimitingfilter import RateLimitingFilter
 
 # *****************************************
@@ -326,6 +326,11 @@ def create_logger(name, filename='./logs/picycle.log', messageformat='%(asctime)
 def default_control():
 	settings = read_settings()
 	control = {}
+	control['settings_update'] = False
+	control['updated'] = True
+	control['mode'] = 'Stop'
+	control['status'] = ''
+	control['next_mode'] = 'Stop'
 	control['curr_speed'] = 0.0
 	control['avg_speed'] = 0.0
 	control['distance'] = 0.0
@@ -418,24 +423,24 @@ def write_control(control, direct_write=False, origin='unknown'):
 		control['origin'] = origin 
 		cmdsts.rpush('control:write', json.dumps(control))
 
-# def execute_control_writes():
-# 	"""
-# 	Execute Control Writes in Queue from Redis DB
+def execute_control_writes():
+	"""
+	Execute Control Writes in Queue from Redis DB
 
-# 	:param None
+	:param None
 
-# 	:return status : 'OK', 'ERROR' 
-# 	"""
-# 	global cmdsts 
+	:return status : 'OK', 'ERROR' 
+	"""
+	global cmdsts 
 
-# 	status = 'OK'
-# 	while cmdsts.llen('control:write') > 0:
-# 		control = read_control()
-# 		command = json.loads(cmdsts.lpop('control:write'))
-# 		command.pop('origin')
-# 		control = deep_update(control, command)
-# 		write_control(control, direct_write=True, origin='writer')
-# 	return status
+	status = 'OK'
+	while cmdsts.llen('control:write') > 0:
+		control = read_control()
+		command = json.loads(cmdsts.lpop('control:write'))
+		command.pop('origin')
+		control = deep_update(control, command)
+		write_control(control, direct_write=True, origin='writer')
+	return status
 
 def read_errors(flush=False):
 	"""
@@ -1329,13 +1334,19 @@ def write_generic_json(dictionary, filename):
 
 # # Borrowed from: https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
 # # Attributed to Alex Martelli and Alex Telon 
-# def deep_update(dictionary, updates):
-# 	for key, value in updates.items():
-# 		if isinstance(value, Mapping):
-# 			dictionary[key] = deep_update(dictionary.get(key, {}), value)
-# 		else:
-# 			dictionary[key] = value
-# 	return dictionary
+def deep_update(dictionary, updates):
+ 	for key, value in updates.items():
+ 		if isinstance(value, Mapping):
+ 			dictionary[key] = deep_update(dictionary.get(key, {}), value)
+ 		else:
+ 			dictionary[key] = value
+ 	return dictionary
+
+MODE_MAP = {
+	'stop' : 'Stop',
+	'error' : 'Error',
+	'riding' : 'Riding'
+}
 
 # MODE_MAP = {
 # 	'startup' : 'Startup',
@@ -1349,6 +1360,7 @@ def write_generic_json(dictionary, filename):
 # 	'hold' : 'Hold',
 # 	'manual' : 'Manual'
 # }
+
 
 # Borrowed from: https://pythonhow.com/how/check-if-a-string-is-a-float/ 
 # Attributed to Python How

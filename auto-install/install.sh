@@ -125,13 +125,19 @@ else
     python -m pip install eventlet
 fi      
 python -m pip install gunicorn
-#python -m pip install gpiozero
+python -m pip install gpiozero
 python -m pip install redis
 #python -m pip install uuid
 #python -m pip install influxdb-client[ciso]
 python -m pip install ratelimitingfilter
 #python -m pip install "pillow>=9.2.0"
 #python -m pip install psutil
+#pip install adafruit-blinka adafruit-circuitpython-st7789
+#pip install adafruit-circuitpython-display-text
+pip install luma.lcd
+pip install luma.core
+pip install windows-curses
+
 
 # Setup config.txt to enable busses 
 clear
