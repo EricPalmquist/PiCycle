@@ -249,7 +249,7 @@ class DisplayBase:
 		self._init_splash()
 
 	def _init_background(self):
-		self.background = Image.open('static/img/display/background.jpg')
+		self.background = Image.open('static/img/display/Bike320x240.png')
 		self.background = self.background.resize((self.WIDTH, self.HEIGHT))
 	
 	def _init_splash(self):
