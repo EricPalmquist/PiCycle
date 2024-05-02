@@ -23,11 +23,13 @@
     }
   },
   "display": {
-    "selected": "st7789_240x320b",
-    "st7789_240x320b": {
+    "selected": "prototype",
+    "ili9341b": {
       "buttonslevel": "HIGH",
-      "rotation": 0
-    }
+      "rotation": 2
+    },
+    "none": {},
+    "prototype": {}
   },
   "globals": {
     "cycle_name": "PC Bike Sim",
@@ -41,11 +43,11 @@
   },
   "gpio_assignments": {
     "_comment": "_Below are gpio numbers, not pin numbers.  18 is a PCM_CLK input so might be good for the pulse input",
-    "buttons": {
+    "rotary_encoder": {
       "_comment": "erics guesses...",
-      "down": 27,
-      "enter": 22,
-      "up": 17
+      "chan_a": 22,
+      "chan_b": 23,
+      "push": 27
     },
     "display": {
       "_comment": "copied from piFire assignments...needs vetting",

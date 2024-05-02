@@ -109,6 +109,21 @@ def settings_page(action=None):
 		if _is_not_blank(response, 'cycle_name'):
 			settings['globals']['cycle_name'] = response['cycle_name']
 
+	if request.method == 'POST' and action == 'gpio':
+		response = request.form
+
+		if _is_not_blank(response, 'gpio_wheel'):
+			settings['gpio_assignments']['wheel']['pulses'] = response['gpio_wheel']
+
+		if _is_not_blank(response, 'gpio_dc'):
+			settings['gpio_assignments']['display']['dc'] = response['gpio_dc']
+
+		if _is_not_blank(response, 'gpio_led'):
+			settings['gpio_assignments']['display']['led'] = response['gpio_led']
+
+		if _is_not_blank(response, 'gpio_rst'):
+			settings['gpio_assignments']['display']['rst'] = response['gpio_rst']
+
 		#control['settings_update'] = True
 
 		write_settings(settings)
@@ -118,6 +133,20 @@ def settings_page(action=None):
 						   settings=settings,
 						   page_theme=settings['globals']['page_theme'],
 						   cycle_name=settings['globals']['cycle_name'])
+
+@app.route('/api', methods=['GET'])
+@app.route('/api/<action>', methods=['GET'])
+def api_page(action=None, arg0=None, arg1=None, arg2=None, arg3=None):
+	global settings
+	global server_status
+	
+	if request.method == 'GET':
+		if action == 'current':
+			''' Only fetch data from RedisDB or locally available, to improve performance '''
+			current = read_current()
+			return jsonify({'current':current}), 201
+		else:
+			return jsonify({'Error':'Received GET request, without valid action'}), 404
 
 '''
 ==============================================================================
@@ -141,6 +170,6 @@ ui_port = int(settings['globals']['ui_port'])
 
 if __name__ == '__main__':
 	if is_real_hardware():
-		socketio.run(app, host='0.0.0.0')
+		socketio.run(app, host='0.0.0.0', port=ui_port)
 	else:
 		socketio.run(app, host='0.0.0.0', debug=True)

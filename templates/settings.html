@@ -9,20 +9,11 @@
 {% block content %}
 <br>
 <div class="row">
-    {% if not request.MOBILE %}
-    <div class="col-3">
-        <!-- Side Navigation Row -->
-        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            <a class="nav-link active" id="v-pills-global-tab" data-toggle="pill" href="#v-pills-global" role="tab" aria-controls="v-pills-global" aria-selected="true">Global Settings</a>
-            <a class="nav-link" id="v-pills-display-tab" data-toggle="pill" href="#v-pills-display" role="tab" aria-controls="v-pills-display" aria-selected="false">Display</a>
-            <a class="nav-link" id="v-pills-gpio-tab" data-toggle="pill" href="#v-pills-gpio" role="tab" aria-controls="v-pills-gpio" aria-selected="false">GPIO</a>
-        </div>
-    </div>
-    {% endif %}
+
     <div class="{% if request.MOBILE %}col-12{% else %}col-9{% endif %}">
         <!-- ============================ Global Settings =============================== -->
         <div class="tab-content" id="v-pills-tabContent">
-            <div class="tab-pane fade" id="v-pills-global" role="tabpanel" aria-labelledby="v-pills-global-tab">
+            <div class="tab-pane fade show active" id="v-pills-global" role="tabpanel" aria-labelledby="v-pills-global-tab">
                 <div class="card shadow">
  
                     <form name="globalsettings" action="/settings/global" method="POST">
@@ -41,23 +32,21 @@
                                 <input type="checkbox" class="custom-control-input" id="real_hw" name="real_hw" {% if settings['globals']['real_hw'] %}checked{% endif %}>
                                 <label class="custom-control-label" for="real_hw" data-toggle="tooltip" title="Running on an rPI">Running on an rPI?</label>
                             </div>
-                            
                              <div class="custom-control custom-switch">
                                <input type="checkbox" class="custom-control-input" id="darkmode" name="darkmode" {% if settings['globals']['page_theme'] == 'dark' %}checked{% endif %}>
                                 <label class="custom-control-label" for="darkmode">Enable Dark Mode</label>
                             </div>
-
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" data-toggle="tooltip" title="Wheel Radius.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; Wheel Radius (in) ({{settings['globals']['wheel_rad_inches']}})</span>
+                                        <i class="fas fa-temperature-high"></i>&nbsp; Wheel Radius (in) </span>
                                 </div>
                                 <input id="wheel_rad_inches" type="number" min="0" step="0.001" class="form-control" placeholder="{{ settings['globals']['wheel_rad_inches'] }}" value="{{ settings['globals']['wheel_rad_inches'] }}" name="wheel_rad_inches">
                             </div>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" data-toggle="tooltip" title="UI Port.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; UI Port ({{settings['globals']['ui_port']}})</span>
+                                        <i class="fas fa-temperature-high"></i>&nbsp; UI Port </span>
                                 </div>
                                 <input id="ui_port" type="number" min="0" step="1" class="form-control" placeholder="{{ settings['globals']['ui_port'] }}" value="{{ settings['globals']['ui_port'] }}" name="ui_port">
                             </div>
@@ -79,6 +68,59 @@
                 {% if not request.MOBILE %}<br><br><br>{% endif %}
             </div><!-- End of Tab -->
         </div>
+
+        <!-- ============================ GPIO Settings =============================== -->
+        <div class="tab-content" id="v-pills-tabContent">
+            <div class="tab-pane fade show active" id="v-pills-gpio" role="tabpanel" aria-labelledby="v-pills-gpio-tab">
+                <div class="card shadow">
+    
+                    <form name="gpiosettings" action="/settings/gpio" method="POST">
+                        <div class="card-header bg-primary text-white">
+                            <h5>
+                                <i class="fas fa-tools"></i>&nbsp; GPIO Assignments
+                            </h5>
+                        </div>
+                        <div class="card-body">
+
+                             <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" title="Wheel Input.">
+                                        <i class="fas fa-temperature-high"></i>&nbsp; Wheel Input</span>
+                                </div>
+                                <input id="gpio_wheel" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['wheel']['pulses']}}" value="{{ settings['gpio_assignments']['wheel']['pulses'] }}" name="gpio_wheel">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" title="Display DC.">
+                                        <i class="fas fa-temperature-high"></i>&nbsp; Display DC</span>
+                                </div>
+                                <input id="gpio_dc" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['display']['dc'] }}" value="{{ settings['gpio_assignments']['display']['dc'] }}" name="gpio_dc">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" title="Display LED.">
+                                        <i class="fas fa-temperature-high"></i>&nbsp; Display LED</span>
+                                </div>
+                                <input id="gpio_led" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['display']['led'] }}" value="{{ settings['gpio_assignments']['display']['led'] }}" name="gpio_led">
+                            </div>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" title="Display RST.">
+                                        <i class="fas fa-temperature-high"></i>&nbsp; Display RST.</span>
+                                </div>
+                                <input id="gpio_rst" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['display']['rst'] }}" value="{{ settings['gpio_assignments']['display']['rst'] }}" name="gpio_rst">
+                            </div>
+
+                        </div><!-- End of card body -->
+                        <div class="card-footer bg-light">
+                            <button type="submit" class="btn btn-outline-danger">Save</button>
+                        </div>
+                    </form>
+                </div><!-- End of Global Settings Card -->
+                {% if not request.MOBILE %}<br><br><br>{% endif %}
+            </div><!-- End of Tab -->
+        </div>
+
     </div>
 </div>
 {% endblock %}
