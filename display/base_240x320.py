@@ -29,13 +29,12 @@ Display base class definition
 '''
 class DisplayBase:
 
-	def __init__(self, dev_pins, config={}):
+	def __init__(self, dev_pins):
 		
-		print('init base')
 		# Init Global Variables and Constants
 		self.dev_pins = dev_pins
 		#self.buttonslevel = config['buttonslevel']
-		self.rotation = int(config['rotation'])
+		self.rotation = 2
 		self.display_active = False
 		self.in_data = None
 		self.status_data = None
@@ -443,7 +442,7 @@ class DisplayBase:
 		img.paste(self.splash, position, self.splash)
 
 		self._display_canvas(img)
-
+		
 	def _display_text(self):
 		# Create canvas
 		img = Image.new('RGBA', (self.WIDTH, self.HEIGHT), color=(0, 0, 0))

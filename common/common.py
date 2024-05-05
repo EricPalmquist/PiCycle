@@ -493,7 +493,7 @@ def read_warnings():
 			cmdsts.delete('warnings')
 	except:
 		warnings = ['Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.']
-		write_log(warnings[0])
+		#write_log(warnings[0])
 
 	return warnings
 
@@ -509,7 +509,7 @@ def write_warning(warning):
 		cmdsts.rpush('warnings', warning)
 	except:
 		event = 'Unable to reach Redis database.  You may need to reinstall PiCycle or enable redis-server.'
-		write_log(event)
+		#write_log(event)
 
 # def read_metrics(all=False):
 # 	"""
@@ -586,7 +586,7 @@ def read_settings(filename='settings.json', init=False, retry_count=0):
 	except(ValueError):
 		# A ValueError Exception occurs when multiple accesses collide, this code attempts a retry.
 		event = 'ERROR: Value Error Exception - JSONDecodeError reading settings.json'
-		write_log(event)
+		#write_log(event)
 		json_data_file.close()
 		# Retry Reading Settings
 		if retry_count < 5: 
@@ -1335,12 +1335,13 @@ def write_generic_json(dictionary, filename):
 # # Borrowed from: https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
 # # Attributed to Alex Martelli and Alex Telon 
 def deep_update(dictionary, updates):
- 	for key, value in updates.items():
- 		if isinstance(value, Mapping):
- 			dictionary[key] = deep_update(dictionary.get(key, {}), value)
- 		else:
- 			dictionary[key] = value
- 	return dictionary
+	for key, value in updates.items():
+		if isinstance(value, Mapping):
+			dictionary[key] = deep_update(dictionary.get(key, {}), value)
+		else:
+			dictionary[key] = value
+
+	return dictionary
 
 MODE_MAP = {
 	'stop' : 'Stop',

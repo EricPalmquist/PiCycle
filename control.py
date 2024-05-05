@@ -30,114 +30,50 @@ from common import *  # Common Module for WebUI and Control Program
 '''
 # Read Settings
 settings = read_settings()
+is_real_hardware = settings['globals']['real_hw']
 
 # Setup logging
-#log_level = logging.DEBUG if settings['globals']['debug_mode'] else logging.ERROR
-log_level = logging.DEBUG if settings['globals']['debug_mode'] else logging.DEBUG
+log_level = logging.DEBUG if settings['globals']['debug_mode'] else logging.ERROR
 controlLogger = create_logger('control', filename='./logs/control.log', messageformat='%(asctime)s [%(levelname)s] %(message)s', level=log_level)
-eventLogger = create_logger('events', filename='/tmp/events.log', messageformat='%(asctime)s [%(levelname)s] %(message)s', level=log_level)
 
 # Flush Redis DB and create JSON structure
 current = read_control(flush=True)
-eventLogger.info('Flushing Redis DB and creating new current structure')
+controlLogger.info('Flushing Redis DB and creating new current structure')
+
+# Load the appropriate hardware interfaces
 
 '''
-Set up our speed reader class object - use the prototype or real based on settings file
+Set up Speed input Module- user the prototype or real based on the settings file
 '''
-try: 
-	if settings['globals']['real_hw']:
-		module = "speed_input.hall_sensor"
-	else:
-		module = "speed_input.prototype"
+module = ''
+if is_real_hardware:
+	module = 'speed_input.hall_sensor'
+else:
+	module = 'speed_input.prototype'
 
-	SpeedModule = importlib.import_module(f'{module}') 
+SpeedModule = importlib.import_module(module) 
+controlLogger.info(f'Imported speed input module from {module}')
 
-	controlLogger.info(f'Loaded speed input module from {module}')
-	print(f'Loaded speed input module from {module}')
-
-except:
-	controlLogger.exception(f'Error occurred loading speed input module "{module}". Trace dump: ')
 
 '''
-Set up Display Module
+Set up Display Module- user the prototype or real based on the settings file
 '''
-try: 
-	display_name = settings['display']['selected']
-	DisplayModule = importlib.import_module(f'display.{display_name}')
-	display_config = settings['display'][display_name]
+module = ''
+if is_real_hardware:
+	module = 'display.ili9341'
+else:
+	module = 'display.prototype'
 
-except:
-	controlLogger.exception(f'Error occurred loading the display module ({display_name}). Trace dump: ')
-	DisplayModule = importlib.import_module('display.none')
-	error_event = f'An error occurred loading the [{settings["modules"]["display"]}] display module.  The ' \
-		f'"display_none" module has been loaded instead.  This sometimes means that the hardware is ' \
-		f'not connected properly, or the module is not configured.  Please run the configuration wizard ' \
-		f'again from the admin panel to fix this issue.'
-	#errors.append(error_event)
-	#write_errors(errors)
-	eventLogger.error(error_event)
-	print(error_event)
-	#if settings['globals']['debug_mode']:
-	#	raise
+DisplayModule = importlib.import_module(module)
+controlLogger.info(f'Imported display module from {module}')
 
-try:
-	display_device = DisplayModule.Display(dev_pins=settings['gpio_assignments'], config=display_config)
-	print('display_device created')
-except:
-	controlLogger.exception(f'Error occurred configuring the display module ({display_name}). Trace dump: ')
-	from display.none import Display  # Simulated Library for controlling the grill platform
-	display_device = Display(dev_pins=settings['gpio_assignments'], config={})
-	error_event = f'An error occurred configuring the [{display_name}] display object.  The ' \
-		f'"display_none" module has been loaded instead.  This sometimes means that the hardware is ' \
-		f'not connected properly, or the module is not configured.  Please run the configuration wizard ' \
-		f'again from the admin panel to fix this issue.'
-	#errors.append(error_event)
-	#write_errors(errors)
-	eventLogger.error(error_event)
-	print(error_event)
-	#if settings['globals']['debug_mode']:
-	#	raise
+display_device = DisplayModule.Display(dev_pins=settings['gpio_assignments'])
+
 '''
 *****************************************
  	Function Definitions
 *****************************************
 '''
-
-def _start_ride_cycle():
-	"""
-	Ride Cycle Function runs when actively riding
-
-	"""
-
-	controlLogger.info(f'Starting a ride.')
-
-	# Setup Cycle Parameters
-	settings = read_settings()
-	pulse_gpio = settings['gpio_assignments']['wheel']['pulses']
-	radius = settings['globals']['wheel_rad_inches']
-	return SpeedModule.BikeSpeed(pulse_gpio, radius)
-
-	# ============ Main Work Cycle ============
-	# while True:
-
-	# 	time.sleep(5)
-
-	# 	current['curr_speed'] = speed_input.curr_speed()
-	# 	current['avg_speed'] = speed_input.avg_speed()
-	# 	current['distance'] = speed_input.distance()
-	# 	current['mode'] = 'Riding'
-
-	# 	write_current(current)
-		
-	# 	print_speed = "{:4.1f}".format(speed_input.avg_speed())
-	# 	print_dist  = "{:4.1f}".format(speed_input.distance())
-	# 	display_text = f'speed = {print_speed}\ndist  = {print_dist}'
-	# 	print(display_text)
-
-		#display.display_text(display_text)
-
-		#controlLogger.debug(f'Current Speed={speed_input.curr_speed()} mph, Average Speed={speed_input.avg_speed()}, Dist={speed_input.distance()}')
-		#print(f'Current Speed={speed_input.curr_speed()} mph, Average Speed={speed_input.avg_speed()}, Dist={speed_input.distance()}')
 
 def _main_loop():
 	''' This loop will dispatch logic based on state '''
@@ -149,16 +85,18 @@ def _main_loop():
 	control['updated'] = True
 	write_control(control, direct_write=True, origin='control')
 
-	last_display_update = 0
+	#last_display_update = 0
 
 	# Loop forever, processing based on the control state
 	while True:
 
-		# Check if there were updates to any of the settings that were flagged
-		if control['settings_update']:
-			control['settings_update'] = False
-			write_control(control, direct_write=True, origin='control')
-			#settings = read_settings()
+		# Check if there were updates to any of the settings that were flagged.  This is not currently
+		# doing anything, but is a place were we could implement certain changes without having to completely
+		# restart
+		# if control['settings_update']:
+		# 	control['settings_update'] = False
+		# 	write_control(control, direct_write=True, origin='control')
+		# 	settings = read_settings()
 		
 		# Ensure all buffered control write requests have been processed and then read the data
   		# from redis  Note that "control" has all of our realtime values and mode info
@@ -167,44 +105,46 @@ def _main_loop():
 
 		# Check to see if the WebUI or the local display published an update to our mode.
 		if control['updated']:
-			eventLogger.debug(f'Control Settings Updated.  New mode is: {control["mode"]}')
+			controlLogger.info(f'Changed to {control["mode"]} mode.')
 			control['updated'] = False  # Reset Control Updated to False
 			write_control(control, direct_write=True, origin='control')  # Commit change in 'updated' status to the file
 
 			if control['mode'] == 'Stop':
-				#TODO what to do when done - save ride?  Have a nice display...
-				#TODO clear the control and status structures so the web UI doesn't continue showing the last values
 				
 				# Kill our speed_input reader object.  Should we choose to ride again a new one will be created
 				if 'speed_input' in dir():
-					print('killing')
 					speed_input.stop_riding()
 
+				#TODO what to do when done - save ride?  Have a nice display...
+				#TODO clear the control and status structures so the web UI doesn't continue showing the last values
+
 			elif control['mode'] == 'Error':
-				#TODO handle this, but I don't think we yet have anything that declares an error
-				pass
+				#TODO handle this, but I don't think we yet have anything that declares an error, so just go to stop mode.
+				control['mode'] == 'Stop'
+				control['updated'] == True
+				write_control(control, direct_write=True, origin='control')
 			
 			elif control['mode'] == 'Riding':
 				# Start a new ride!
-				speed_input = _start_ride_cycle()
+				settings = read_settings()
+				pulse_gpio = settings['gpio_assignments']['wheel']['pulses']
+				radius = settings['globals']['wheel_rad_inches']
+				speed_input = SpeedModule.BikeSpeed(pulse_gpio, radius)
 		
 		elif control['mode'] == 'Riding':
 
-			eventLogger.debug('in riding mode')
 			# Update the display and other redis data periodically
-			if (time.time() - last_display_update) > 0.5:
-				current['curr_speed'] = speed_input.curr_speed()
-				current['avg_speed'] = speed_input.avg_speed()
-				current['distance'] = speed_input.distance()
-				write_current(current)
+			#if (time.time() - last_display_update) > 0.5:
+			current['curr_speed'] = speed_input.curr_speed()
+			current['avg_speed'] = speed_input.avg_speed()
+			current['distance'] = speed_input.distance()
+			write_current(current)
 
-				# Send Data to Display
-				display_device.display_status(current)
+			# Send Data to Display
+			display_device.display_status(current)
 
-		# rest for 2 seconds
-		time.sleep(2)
-
+		# rest for 1 seconds
+		time.sleep(1)
 
 # Start running the main loop, which will run forever
-
 _main_loop()

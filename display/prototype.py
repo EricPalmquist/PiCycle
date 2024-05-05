@@ -12,134 +12,105 @@
 # Imported Libraries
 # *****************************************
 
-import curses
+import threading
 import time
+from pynput import keyboard
+from display.base_240x320 import DisplayBase
 
-class Display:
+import cv2
+import numpy as np
 
-	def __init__(self, dev_pins, buttonslevel='HIGH', rotation=0, config={}):
-		curses.wrapper(self._curses_main)
-		curses.curs_set(0)  # Invisible Cursor 
-		curses.start_color()  # Init Color
-		curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
-		curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
-		curses.init_pair(3, curses.COLOR_WHITE, curses.COLOR_BLACK)
-		curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-		curses.init_pair(5, curses.COLOR_RED, curses.COLOR_BLACK)
-		curses.init_pair(6, curses.COLOR_GREEN, curses.COLOR_BLACK)
+class Display(DisplayBase):
 
-		self.display_splash()
+	def __init__(self, dev_pins):
+		super().__init__(dev_pins)
 
-	def _curses_main(self, screen):
-		self.screen = screen
+	def __del__(self):
+		cv2.destroyAllWindows()
 
-	def display_status(self, in_data, status_data):
-		''' Screen Box '''
-		self.screen.clear()
-		num_rows, num_cols = self.screen.getmaxyx()
-		self.screen.box()
-		title = f"| Mode: {status_data['mode']} |"
-		title_col = (num_cols // 2) - (len(title) // 2)
-		title_color = curses.color_pair(2)
-		self.screen.addstr(0, title_col, title, title_color)
+	def _init_display_device(self):
 
-		''' Temp Info '''
-		line = 1
-		display_color = curses.color_pair(1)
-		for index, group in enumerate(in_data['probe_history']):
-			for item in in_data['probe_history'][group]:
-				if group != 'tr':
-					display_text = f"{item}: {in_data['probe_history'][group][item]} {self.units}"
-					self.screen.addstr(line, 3, display_text)
-					if group == 'primary':
-						display_text = f"{item} Setpoint: {in_data['primary_setpoint']} {self.units} Target: {in_data['notify_targets'][item]} {self.units}"
-					else: 
-						display_text = f"{item} Target: {in_data['notify_targets'][item]} {self.units}"
-					self.screen.addstr(line, (num_cols // 2), display_text, display_color)
-					line += 1
+		#self.device = ili9341(self.serial, active_low=False, gpio_LIGHT=led_pin, rotate=self.rotation)
 
-		''' Notification Info '''
-		line += 1
-		line_bak = line
-		display_color = curses.color_pair(4)
-		for index, item in enumerate(status_data['notify_data']):
-			if item['req']:
-				display_text = f" * {item['label']} Notify"
-				self.screen.addstr(line, (num_cols // 2), display_text, display_color)
-				line += 1
+		# Setup & Start Display Loop Thread 
+		display_thread = threading.Thread(target=self._display_loop)
+		display_thread.start()
 
-		''' Active Hardware Pins '''
-		line = line_bak 
-		for item in status_data['outpins']:
-			if status_data['outpins'][item]:
-				display_text = f"{item}: ON"
-				self.screen.addstr(line, 3, display_text)
-			else:
-				display_text = f"{item}: OFF"
-				self.screen.addstr(line, 3, display_text)
-			line += 1
+		print('started display thread')
 
-		''' Show Pellet Level '''
-		line += 1
-		if status_data["hopper_level"] >= 70:
-			display_color = curses.color_pair(6)
-		elif status_data["hopper_level"] >= 25:
-			display_color = curses.color_pair(4)
-		else:
-			display_color = curses.color_pair(5)
-			
-		display_text = f'Pellet Level: {status_data["hopper_level"]}%'
-		self.screen.addstr(line, 3, display_text, display_color)
-		
-		''' Show the screen '''
-		self.screen.refresh()
 
-	def display_splash(self):
-		splash_str = []
-		splash_str.append('______ _ _____            _      ')
-		splash_str.append('| ___ (_)  __ \          | |     ')
-		splash_str.append('| |_/ /_| /  \/_   _  ___| | ___ ')
-		splash_str.append('|  __/| | |   | | | |/ __| |/ _ \\')
-		splash_str.append('| |   | | \__/\ |_| | (__| |  __/')
-		splash_str.append('\_|   |_|\____/\__, |\___|_|\___|')
-		splash_str.append('                __/ |            ')
-		splash_str.append('               |___/ ')
-		self.screen.clear()
-		num_rows, num_cols = self.screen.getmaxyx()
-		self.screen.box()
-		title = '| PiFire Display |'
-		title_col = (num_cols // 2) - (len(title) // 2)
-		title_color = curses.color_pair(2)
-		self.screen.addstr(0, title_col, title, title_color)
-		splash_str_start = (num_cols // 2) - (len(splash_str[7]) // 2)
-		splash_color = curses.color_pair(2)
-		for line in range(0, len(splash_str)):
-			self.screen.addstr(line+3, splash_str_start, splash_str[line], splash_color)
-		self.screen.refresh()
-		time.sleep(1)
+	def _init_input(self):
+		self.input_enabled = True
+		self.input_event = None
 
-	def clear_display(self):
-		''' Screen Box '''
-		self.screen.clear()
-		num_rows, num_cols = self.screen.getmaxyx()
-		self.screen.box()
-		title = '| PiFire Display |'
-		title_col = (num_cols // 2) - (len(title) // 2)
-		title_color = curses.color_pair(2)
-		self.screen.addstr(0, title_col, title, title_color)
+		print('F1=up, F2=down, F3=enter')
 
-		self.screen.refresh()
+		key_listener_thread = keyboard.Listener(on_press=self._keypress)
+		key_listener_thread.start()
 
-	def display_text(self, text):
-		self.screen.clear()
-		num_rows, num_cols = self.screen.getmaxyx()
-		self.screen.box()
-		title = 'PiCycle Display'
-		title_col = (num_cols // 2) - (len(title) // 2)
-		self.screen.addstr(0, title_col, title)
-		text_str_start = (num_cols // 2) - (len(text) // 2)
-		self.screen.addstr(3, text_str_start, text)
-		self.screen.refresh()
+		self._init_menu()
+		print('initialized menu')
 
-	def display_network(self):
+	'''
+	============== Input Callbacks ============= 
+	'''
+	def _keypress(self, key):
+		if key.vk == 171:
+			self.input_event='ENTER'
+		elif key.vk == 167:
+			self.input_event = 'UP'
+		elif key.vk == 166:
+			self.input_event = 'DOWN'
+
+	'''
+	============== Graphics / Display / Draw Methods ============= 
+	'''
+
+	def _display_clear(self):
+		#self.device.clear()
+		#self.device.backlight(False)
+		#self.device.hide()
+		blank_image = np.zeros((self.HEIGHT,self.WIDTH,3), np.uint8)
+		cv2.imshow('PiCycle', blank_image)
+		cv2.waitKey(delay=1)
+
 		pass
+
+	def _display_canvas(self, canvas):
+		# Display Image
+		# npImage = np.asarray(canvas)
+		# frameBGR = cv2.cvtColor(npImage, cv2.COLOR_RGB2BGR)
+		# cv2imshow('Test', frameBGR)
+		npImage = np.array(canvas)
+		opencvImage = cv2.cvtColor(npImage, cv2.COLOR_RGB2BGR)
+		cv2.imshow('PiCycle', opencvImage)
+		cv2.waitKey(delay=1)
+		# self.device.backlight(True)
+		# self.device.show()
+		# self.device.display(canvas.convert(mode="RGB"))
+
+	'''
+	 ====================== Input & Menu Code ========================
+	'''
+	def _event_detect(self):
+		"""
+		Called to detect input events from buttons.
+		"""
+		#print(f'Received command {self.input_event}')
+
+		command = self.input_event  # Save to variable to prevent spurious changes 
+		self.input_event = None
+
+		if command:
+			self.display_timeout = None  # If something is being displayed i.e. text, network, splash then override this
+
+			if command not in ['UP', 'DOWN', 'ENTER']:
+				return
+
+			self.display_command = None
+			self.display_data = None
+			self.input_event=None
+			self.menu_active = True
+			self.menu_time = time.time()
+			self._menu_display(command)
+			self.input_counter = 0
