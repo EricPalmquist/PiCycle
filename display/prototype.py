@@ -43,7 +43,7 @@ class Display(DisplayBase):
 		self.input_enabled = True
 		self.input_event = None
 
-		print('F1=up, F2=down, F3=enter')
+		print('Special keys on erics keyboard, forward, back, and *')
 
 		key_listener_thread = keyboard.Listener(on_press=self._keypress)
 		key_listener_thread.start()
@@ -67,27 +67,15 @@ class Display(DisplayBase):
 	'''
 
 	def _display_clear(self):
-		#self.device.clear()
-		#self.device.backlight(False)
-		#self.device.hide()
 		blank_image = np.zeros((self.HEIGHT,self.WIDTH,3), np.uint8)
 		cv2.imshow('PiCycle', blank_image)
 		cv2.waitKey(delay=1)
 
-		pass
-
 	def _display_canvas(self, canvas):
-		# Display Image
-		# npImage = np.asarray(canvas)
-		# frameBGR = cv2.cvtColor(npImage, cv2.COLOR_RGB2BGR)
-		# cv2imshow('Test', frameBGR)
 		npImage = np.array(canvas)
 		opencvImage = cv2.cvtColor(npImage, cv2.COLOR_RGB2BGR)
 		cv2.imshow('PiCycle', opencvImage)
 		cv2.waitKey(delay=1)
-		# self.device.backlight(True)
-		# self.device.show()
-		# self.device.display(canvas.convert(mode="RGB"))
 
 	'''
 	 ====================== Input & Menu Code ========================
@@ -96,8 +84,6 @@ class Display(DisplayBase):
 		"""
 		Called to detect input events from buttons.
 		"""
-		#print(f'Received command {self.input_event}')
-
 		command = self.input_event  # Save to variable to prevent spurious changes 
 		self.input_event = None
 
