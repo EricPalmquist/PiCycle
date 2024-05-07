@@ -790,78 +790,78 @@ def write_settings(settings):
 # 	write_log(warning)
 # 	return(settings)
 
-# def read_events(legacy=True):
-# 	"""
-# 	Read event.log and populate an array of events.
+def read_events(legacy=True):
+	"""
+	Read event.log and populate an array of events.
 
-# 	if legacy=true:
-# 	:return: (event_list, num_events)
+	if legacy=true:
+	:return: (event_list, num_events)
 
-# 	if legacy=false:
-# 	:return: (event_list, num_events)
-# 	"""
-# 	# Read all lines of events.log into a list(array)
-# 	try:
-# 		with open('/tmp/events.log') as event_file:
-# 			event_lines = event_file.readlines()
-# 			event_file.close()
-# 	# If file not found error, then create events.log file
-# 	except(IOError, OSError):
-# 		event_file = open('/tmp/events.log', "w")
-# 		event_file.close()
-# 		event_lines = []
+	if legacy=false:
+	:return: (event_list, num_events)
+	"""
+	# Read all lines of events.log into a list(array)
+	try:
+		with open('/tmp/events.log') as event_file:
+			event_lines = event_file.readlines()
+			event_file.close()
+	# If file not found error, then create events.log file
+	except(IOError, OSError):
+		event_file = open('/tmp/events.log', "w")
+		event_file.close()
+		event_lines = []
 
-# 	# Initialize event_list list
-# 	event_list = []
+	# Initialize event_list list
+	event_list = []
 
-# 	# Get number of events
-# 	num_events = len(event_lines)
+	# Get number of events
+	num_events = len(event_lines)
 
-# 	if legacy:
-# 		for x in range(num_events):
-# 			event_list.insert(0, event_lines[x].split(" ",2))
+	if legacy:
+		for x in range(num_events):
+			event_list.insert(0, event_lines[x].split(" ",2))
 
-# 		# Error handling if number of events is less than 10, fill array with empty
-# 		if num_events < 10:
-# 			for line in range((10-num_events)):
-# 				event_list.append(["--------","--:--:--","---"])
-# 			num_events = 10
-# 	else:
-# 		for x in range(num_events):
-# 			event_list.append(event_lines[x].split(" ",2))
-# 		return event_list
+		# Error handling if number of events is less than 10, fill array with empty
+		if num_events < 10:
+			for line in range((10-num_events)):
+				event_list.append(["--------","--:--:--","---"])
+			num_events = 10
+	else:
+		for x in range(num_events):
+			event_list.append(event_lines[x].split(" ",2))
+		return event_list
 
-# 	return(event_list, num_events)
+	return(event_list, num_events)
 
-# def read_log_file(filepath):
-# 	# Read all lines of events.log into a list(array)
-# 	try:
-# 		with open(filepath) as log_file:
-# 			log_file_lines = log_file.readlines()
-# 			log_file.close()
-# 	# If file not found error, then create events.log file
-# 	except(IOError, OSError):
-# 		event = f'Unable to open log file: {filepath}'
-# 		write_log(event)
-# 		return []
+def read_log_file(filepath):
+	# Read all lines of events.log into a list(array)
+	try:
+		with open(filepath) as log_file:
+			log_file_lines = log_file.readlines()
+			log_file.close()
+	# If file not found error, then create events.log file
+	except(IOError, OSError):
+		event = f'Unable to open log file: {filepath}'
+		write_log(event)
+		return []
 
-# 	return log_file_lines 
+	return log_file_lines 
 
-# def add_line_numbers(event_list):
-# 	event_lines = []
-# 	for index, line in enumerate(event_list):
-# 		event_lines.append([index, line])
-# 	return event_lines 
+def add_line_numbers(event_list):
+	event_lines = []
+	for index, line in enumerate(event_list):
+		event_lines.append([index, line])
+	return event_lines 
 
-# def write_log(event):
-# 	"""
-# 	Write event to event.log
+def write_log(event):
+	"""
+	Write event to event.log
 
-# 	:param event: String event
-# 	"""
-# 	log_level = logging.INFO
-# 	eventLogger = create_logger('events', filename='/tmp/events.log', messageformat='%(asctime)s [%(levelname)s] %(message)s', level=log_level)
-# 	eventLogger.info(event)
+	:param event: String event
+	"""
+	log_level = logging.INFO
+	eventLogger = create_logger('events', filename='/tmp/events.log', messageformat='%(asctime)s [%(levelname)s] %(message)s', level=log_level)
+	eventLogger.info(event)
 
 # def write_event(settings, event):
 # 	"""
