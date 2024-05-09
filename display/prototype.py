@@ -30,8 +30,6 @@ class Display(DisplayBase):
 
 	def _init_display_device(self):
 
-		#self.device = ili9341(self.serial, active_low=False, gpio_LIGHT=led_pin, rotate=self.rotation)
-
 		# Setup & Start Display Loop Thread 
 		display_thread = threading.Thread(target=self._display_loop)
 		display_thread.start()
@@ -45,6 +43,7 @@ class Display(DisplayBase):
 
 		print('Special keys on erics keyboard, forward, back, and *')
 
+		#keywords = {'name': 'keyreader'}
 		key_listener_thread = keyboard.Listener(on_press=self._keypress)
 		key_listener_thread.start()
 
@@ -54,13 +53,19 @@ class Display(DisplayBase):
 	'''
 	============== Input Callbacks ============= 
 	'''
-	def _keypress(self, key):
-		if key.vk == 171:
-			self.input_event='ENTER'
-		elif key.vk == 167:
-			self.input_event = 'UP'
-		elif key.vk == 166:
-			self.input_event = 'DOWN'
+	def _keypress(self, key:keyboard.Key):
+
+		try:
+			if key.vk == 171:
+				self.input_event='ENTER'
+			elif key.vk == 167:
+				self.input_event = 'UP'
+			elif key.vk == 166:
+				self.input_event = 'DOWN'
+		except:
+			# Some keys (like enter) don't supply the above with a .vk value, so
+			# we will just ignore them
+			pass
 
 	'''
 	============== Graphics / Display / Draw Methods ============= 
