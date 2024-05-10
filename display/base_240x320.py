@@ -29,13 +29,12 @@ Display base class definition
 '''
 class DisplayBase:
 
-	def __init__(self, dev_pins, config={}):
+	def __init__(self, dev_pins):
 		
-		print('init base')
 		# Init Global Variables and Constants
 		self.dev_pins = dev_pins
 		#self.buttonslevel = config['buttonslevel']
-		self.rotation = int(config['rotation'])
+		self.rotation = 2
 		self.display_active = False
 		self.in_data = None
 		self.status_data = None
@@ -96,17 +95,17 @@ class DisplayBase:
 			'Start': {
 				'displaytext': 'Start',
 				'icon': '\uf04b', # FontAwesome Play Icon
-				'iconcolor': (255,255,255)  
+				'iconcolor': (120, 169, 235)  
 			},
 			'Network': {
 				'displaytext': 'IP QR Code',
 				'icon': '\uf1eb', # FontAwesome Wifi Icon
-				'iconcolor': (255,255,255)
+				'iconcolor': (120, 169, 235)
 			},
 			'Power':{
 				'displaytext': 'Power Menu',
 				'icon': '\uf0e7', #FontAwesome Power Icon
-				'iconcolor' : (255,255,255)
+				'iconcolor' : (120, 169, 235)
 			}
 		}
 
@@ -115,12 +114,12 @@ class DisplayBase:
 			'Stop': {
 				'displaytext': 'Stop',
 				'icon': '\uf04d',  # FontAwesome Stop Icon
-				'iconcolor': (255,255,255)
+				'iconcolor': (120, 169, 235)
 			},
 			'Network': {
 				'displaytext': 'IP QR Code',
 				'icon': '\uf1eb', # FontAwesome Wifi Icon
-				'iconcolor': (255,255,255)
+				'iconcolor': (120, 169, 235)
 			},
 		}
 
@@ -128,17 +127,17 @@ class DisplayBase:
 			'Power_Off' : {
 				'displaytext' : 'Shutdown',
 				'icon': '\uf011', # FontAwesome Power Button
-				'iconcolor': (255,255,255)
+				'iconcolor': (120, 169, 235)
 			},
 			'Power_Restart' : {
 				'displaytext': 'Restart',
 				'icon': '\uf2f9', # FontAwesome Circle Arrow
-				'iconcolor': (255,255,255)
+				'iconcolor': (120, 169, 235)
 			},
 			'Menu_Back' : {
 				'displaytext' : 'Back',
 				'icon' : '\uf060', # FontAwesome Back Arrow
-				'iconcolor': (255,255,255)
+				'iconcolor': (120, 169, 235)
 			}
 		}
 
@@ -178,7 +177,7 @@ class DisplayBase:
 			if self.display_command == 'text':
 				self._display_text()
 				self.display_command = None
-				self.display_timeout = time.time() + 10
+				self.display_timeout = time.time() + 15
 
 			if self.display_command == 'network':
 				s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -249,16 +248,17 @@ class DisplayBase:
 		self._init_splash()
 
 	def _init_background(self):
-		self.background = Image.open('static/img/display/background.jpg')
+		self.background = Image.open('static/img/display/background.png')
 		self.background = self.background.resize((self.WIDTH, self.HEIGHT))
 	
 	def _init_splash(self):
-		self.splash = Image.open('static/img/display/color-boot-splash.png')
-		(self.splash_width, self.splash_height) = self.splash.size
-		self.splash_width *= 2
-		self.splash_height *= 2
-		self.splash = self.splash.resize((self.splash_width, self.splash_height))
-
+		self.splash = Image.open('static/img/display/background.png')
+		# (self.splash_width, self.splash_height) = self.splash.size
+		# self.splash_width *= 2
+		# self.splash_height *= 2
+		# self.splash = self.splash.resize((self.splash_width, self.splash_height))
+		self.splash = self.splash.resize((self.WIDTH, self.HEIGHT))
+		
 	def _rounded_rectangle(self, draw, xy, rad, fill=None):
 		x0, y0, x1, y1 = xy
 		draw.rectangle([(x0, y0 + rad), (x1, y1 - rad)], fill=fill)
@@ -439,11 +439,12 @@ class DisplayBase:
 		img = Image.new('RGBA', (self.WIDTH, self.HEIGHT), color=(0, 0, 0))
 
 		# Set the position & paste the splash image onto the canvas
-		position = ((self.WIDTH - self.splash_width) // 2, (self.HEIGHT - self.splash_height) // 2)
+		#position = ((self.WIDTH - self.splash_width) // 2, (self.HEIGHT - self.splash_height) // 2)
+		position = (0, 0)
 		img.paste(self.splash, position, self.splash)
 
 		self._display_canvas(img)
-
+		
 	def _display_text(self):
 		# Create canvas
 		img = Image.new('RGBA', (self.WIDTH, self.HEIGHT), color=(0, 0, 0))

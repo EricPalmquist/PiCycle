@@ -30,7 +30,7 @@
                             </div>
                             <div class="custom-control custom-switch">
                                 <input type="checkbox" class="custom-control-input" id="real_hw" name="real_hw" {% if settings['globals']['real_hw'] %}checked{% endif %}>
-                                <label class="custom-control-label" for="real_hw" data-toggle="tooltip" title="Running on an rPI">Running on an rPI?</label>
+                                <label class="custom-control-label" for="real_hw" data-toggle="tooltip" title="Running on an rPI">Running on a real rPI?</label>
                             </div>
                              <div class="custom-control custom-switch">
                                <input type="checkbox" class="custom-control-input" id="darkmode" name="darkmode" {% if settings['globals']['page_theme'] == 'dark' %}checked{% endif %}>
@@ -39,14 +39,14 @@
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" data-toggle="tooltip" title="Wheel Radius.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; Wheel Radius (in) </span>
+                                        <i class="fas fa-futbol></i>&nbsp; Wheel Radius (in) </span>
                                 </div>
                                 <input id="wheel_rad_inches" type="number" min="0" step="0.001" class="form-control" placeholder="{{ settings['globals']['wheel_rad_inches'] }}" value="{{ settings['globals']['wheel_rad_inches'] }}" name="wheel_rad_inches">
                             </div>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" data-toggle="tooltip" title="UI Port.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; UI Port </span>
+                                        <i class="fas wifi"></i>&nbsp; UI Port </span>
                                 </div>
                                 <input id="ui_port" type="number" min="0" step="1" class="form-control" placeholder="{{ settings['globals']['ui_port'] }}" value="{{ settings['globals']['ui_port'] }}" name="ui_port">
                             </div>
@@ -85,30 +85,54 @@
                              <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" data-toggle="tooltip" title="Wheel Input.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; Wheel Input</span>
+                                        <i class="fas fa-futbol"></i>&nbsp; Wheel Input</span>
                                 </div>
                                 <input id="gpio_wheel" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['wheel']['pulses']}}" value="{{ settings['gpio_assignments']['wheel']['pulses'] }}" name="gpio_wheel">
                             </div>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" title="Display DC.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; Display DC</span>
+                                    <span class="input-group-text" data-toggle="tooltip" title="Display DC">
+                                        <i class="fas fa-display"></i>&nbsp; Display DC</span>
                                 </div>
                                 <input id="gpio_dc" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['display']['dc'] }}" value="{{ settings['gpio_assignments']['display']['dc'] }}" name="gpio_dc">
                             </div>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" title="Display LED.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; Display LED</span>
+                                    <span class="input-group-text" data-toggle="tooltip" title="Display LED">
+                                        <i class="fas fa-display"></i>&nbsp; Display LED</span>
                                 </div>
                                 <input id="gpio_led" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['display']['led'] }}" value="{{ settings['gpio_assignments']['display']['led'] }}" name="gpio_led">
                             </div>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" data-toggle="tooltip" title="Display RST.">
-                                        <i class="fas fa-temperature-high"></i>&nbsp; Display RST.</span>
+                                    <span class="input-group-text" data-toggle="tooltip" title="Display RST">
+                                        <i class="fas fa-display"></i>&nbsp; Display RST</span>
                                 </div>
                                 <input id="gpio_rst" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['display']['rst'] }}" value="{{ settings['gpio_assignments']['display']['rst'] }}" name="gpio_rst">
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" title="Rotary Ch a">
+                                        <i class="fas fa-atom"></i>&nbsp; Rotary A</span>
+                                </div>
+                                <input id="gpio_ch_a" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['rotary_encoder']['chan_a'] }}" value="{{ settings['gpio_assignments']['rotary_encoder']['chan_a'] }}" name="gpio_ch_a">
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" title="Rotary Ch b">
+                                        <i class="fas fa-atom"></i>&nbsp; Rotary B</span>
+                                </div>
+                                <input id="gpio_ch_b" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['rotary_encoder']['chan_b'] }}" value="{{ settings['gpio_assignments']['rotary_encoder']['chan_b'] }}" name="gpio_ch_b">
+                            </div>
+                            
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" data-toggle="tooltip" title="Rotary Btn">
+                                        <i class="fas fa-atom"></i>&nbsp; Rotary Btn</span>
+                                </div>
+                                <input id="gpio_btn" type="number" min="1" step="1" max=40 class="form-control" placeholder="{{ settings['gpio_assignments']['rotary_encoder']['gpio_btn'] }}" value="{{ settings['gpio_assignments']['rotary_encoder']['push'] }}" name="gpio_btn">
                             </div>
 
                         </div><!-- End of card body -->

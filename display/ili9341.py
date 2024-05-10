@@ -28,8 +28,8 @@ Display class definition
 '''
 class Display(DisplayBase):
 
-	def __init__(self, dev_pins, config):
-		super().__init__(dev_pins, config)
+	def __init__(self, dev_pins):
+		super().__init__(dev_pins)
 
 	def _init_display_device(self):
 		# Init Device
@@ -78,7 +78,6 @@ class Display(DisplayBase):
 		self._init_menu()
 
 	def __del__(self):
-		print('display delete called')
 		gpio.cleanup()
 
 	'''
