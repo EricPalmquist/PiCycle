@@ -137,6 +137,7 @@ python -m pip install ratelimitingfilter
 pip install luma.lcd
 pip install luma.core
 pip install windows-curses
+pip install pynput
 
 
 # Setup config.txt to enable busses 
