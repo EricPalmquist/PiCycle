@@ -20,6 +20,7 @@ from display.base_240x320 import DisplayBase
 import cv2
 import numpy as np
 
+
 class Display(DisplayBase):
 
 	def __init__(self, dev_pins):
@@ -36,15 +37,15 @@ class Display(DisplayBase):
 
 		print('started display thread')
 
-
 	def _init_input(self):
 		self.input_enabled = True
 		self.input_event = None
 
-		print('Special keys on erics keyboard, forward, back, and *')
-
-		#keywords = {'name': 'keyreader'}
-		key_listener_thread = keyboard.Listener(on_press=self._keypress)
+		# There is likely better keys than this, but it seems to work!
+		key_listener_thread = keyboard.GlobalHotKeys({
+			'<alt>+<ctrl>+q': self._do_up,
+			'<alt>+<ctrl>+w': self._do_down,
+			'<alt>+<ctrl>+e': self._do_enter})
 		key_listener_thread.start()
 
 		self._init_menu()
@@ -53,38 +54,35 @@ class Display(DisplayBase):
 	'''
 	============== Input Callbacks ============= 
 	'''
-	def _keypress(self, key:keyboard.Key):
 
-		try:
-			if key.vk == 171:
-				self.input_event='ENTER'
-			elif key.vk == 167:
-				self.input_event = 'UP'
-			elif key.vk == 166:
-				self.input_event = 'DOWN'
-		except:
-			# Some keys (like enter) don't supply the above with a .vk value, so
-			# we will just ignore them
-			pass
+	def _do_up(self):
+		self.input_event = 'UP'
+
+	def _do_down(self):
+		self.input_event = 'DOWN'
+
+	def _do_enter(self):
+		self.input_event = 'ENTER'
 
 	'''
 	============== Graphics / Display / Draw Methods ============= 
 	'''
 
 	def _display_clear(self):
-		blank_image = np.zeros((self.HEIGHT,self.WIDTH,3), np.uint8)
+		blank_image = np.zeros((self.HEIGHT, self.WIDTH, 3), np.uint8)
 		cv2.imshow('PiCycle', blank_image)
 		cv2.waitKey(delay=1)
 
 	def _display_canvas(self, canvas):
-		npImage = np.array(canvas)
-		opencvImage = cv2.cvtColor(npImage, cv2.COLOR_RGB2BGR)
-		cv2.imshow('PiCycle', opencvImage)
+		np_image = np.array(canvas)
+		opencv_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
+		cv2.imshow('PiCycle', opencv_image)
 		cv2.waitKey(delay=1)
 
 	'''
-	 ====================== Input & Menu Code ========================
+	====================== Input & Menu Code ========================
 	'''
+
 	def _event_detect(self):
 		"""
 		Called to detect input events from buttons.
@@ -100,7 +98,7 @@ class Display(DisplayBase):
 
 			self.display_command = None
 			self.display_data = None
-			self.input_event=None
+			self.input_event = None
 			self.menu_active = True
 			self.menu_time = time.time()
 			self._menu_display(command)
