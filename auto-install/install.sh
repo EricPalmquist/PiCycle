@@ -134,11 +134,11 @@ python -m pip install ratelimitingfilter
 #python -m pip install psutil
 #pip install adafruit-blinka adafruit-circuitpython-st7789
 #pip install adafruit-circuitpython-display-text
-pip install luma.lcd
-pip install luma.core
-pip install windows-curses
-pip install pynput
-
+python -m pip install luma.lcd
+python -m pip install luma.core
+#python -m pip install windows-curses
+python -m pip install pynput
+python -m pip install opencv-python
 
 # Setup config.txt to enable busses 
 clear
