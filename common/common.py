@@ -416,12 +416,16 @@ def write_control(control, direct_write=False, origin='unknown'):
 	"""
 	global cmdsts
 
-	if direct_write: 
-		cmdsts.set('control:general', json.dumps(control))
-	else: 
-		# Add changes to control write queue 
-		control['origin'] = origin 
-		cmdsts.rpush('control:write', json.dumps(control))
+	try:
+		if direct_write: 
+			cmdsts.set('control:general', json.dumps(control))
+		else: 
+			# Add changes to control write queue 
+			control['origin'] = origin 
+			cmdsts.rpush('control:write', json.dumps(control))
+	except Exception as e:
+		print('Error connecting to redis.  Try sudo service redis-server start', e)
+		raise
 
 def execute_control_writes():
 	"""
